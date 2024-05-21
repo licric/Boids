@@ -1,8 +1,10 @@
 *comandi più utili*
 ->git push is the command used to update the remote
 repository (local->remote)  //fails of remote version is bigger (newer) than local
+
 ->git fetch allows to pull commits, files and refs from the
 remote repository without merging with the local (local<-remote)
+
 ->git pull will fetch the files and also merge them with the
 current state of your workspace (local directory<-local repository)
 
