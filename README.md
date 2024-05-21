@@ -1,4 +1,4 @@
-*comandi più utili*
+COMANDI PIù UTILI 
 
 ->git push is the command used to update the remote
 repository (local->remote)  //fails of remote version is bigger (newer) than local
@@ -14,7 +14,7 @@ current state of your workspace (local directory<-local repository)
 
 
 
-*scrivo un nuovo file*
+SE SCRIVO UN NUOVO FILE
 
 $ git add "filename"
 
@@ -24,13 +24,13 @@ $ git push
 
 
 
-*clonare tutta la cartella online git sul pc*
+CLONARE TUTTA LA CARTELLA ONLINE GIT SUL PC
 
 $ git clone git@github.com:licric/Boids_programmazione_24.git
 
 
 
-*creare un nuovo branch*
+CREARE UN NUOVO BRANCH
 
 $ git branch "new_branch"
 
@@ -38,7 +38,7 @@ $ git branch                   //mostra tutti i branch
 
 
 
-*cambiare branch*
+CAMBIARE BRANCH
 
 ->se faccio commit i salvataggi vengono fatti sul branch attivo
 
@@ -46,7 +46,7 @@ $ git switch "branch_name"     //cambia branch
 
 
 
-*merge two branches*
+MERGA TWO BRANCHES
 
 $ git switch main            //first switch to destination branch
 
@@ -57,7 +57,7 @@ that conflict in both commit sequences
 
 
 
-*altri comandi*
+ALTRI COMANDI
 
 git log shows the local repository history
 
