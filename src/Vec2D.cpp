@@ -38,12 +38,6 @@ Vec2D Vec2D::operator/(double const& c) const
     return Vec2D{x_ / c, y_ / c};
 }
 
-/*
-bool Vec2D::operator!=(Vec2D const& other) const
-{
-  return (x_ != other.x_) && (y_ != other.y_);
-}
-*/
 
 Vec2D Vec2D::invertX()
 {

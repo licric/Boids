@@ -2,7 +2,7 @@
 #define PVECTOR_HPP
 
 class Vec2D
-{
+{  
   double x_{};
   double y_{};
 
@@ -31,10 +31,9 @@ class Vec2D
   Vec2D operator*(double const& c) const;
   Vec2D operator/(double const& c) const;
 
-  
-  //bool operator==(Vec2D const& other) const;
-  bool operator!=(Vec2D const& other) const;
-  
+  Vec2D invertX();
+  Vec2D invertY();
+
 
   double magnitude() const;
   double angleBetween(Vec2D const& other) const;
