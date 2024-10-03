@@ -49,13 +49,11 @@ Vec2D Vec2D::operator/(double const& c) const
     return Vec2D{x_ / c, y_ / c};
 }
 
-Vec2D Vec2D::rotate(double angle) const 
+void Vec2D::rotate(double angle) 
 {
-      double x_new = x_ * std::cos(angle*M_PI/180.) - y_ * std::sin(angle*M_PI/180.);
-      double y_new = x_ * std::sin(angle*M_PI/180.) + y_ * std::cos(angle*M_PI/180.);
-
-      return Vec2D(x_new, y_new);
-  }
+      x_ = x_ * std::cos(angle*M_PI/180.) - y_ * std::sin(angle*M_PI/180.);
+      y_ = x_ * std::sin(angle*M_PI/180.) + y_ * std::cos(angle*M_PI/180.);
+}
 
 
 void Vec2D::invertX()

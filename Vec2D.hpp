@@ -29,8 +29,8 @@ class Vec2D
   Vec2D operator+(Vec2D const& other) const;
   Vec2D operator*(double const& c) const;
   Vec2D operator/(double const& c) const;
-  Vec2D rotate(double angle) const;
 
+  void rotate(double angle);
   void invertX();
   void invertY();
 

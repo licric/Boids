@@ -62,7 +62,6 @@ int main()
   auto const delta_t{sf::milliseconds(33)};
   int const fps = 30;
 
-
   //creazione di  "Flock f"
   unsigned int numBoids;
   double a;
@@ -72,17 +71,16 @@ int main()
  
   std::cout<<"inserire il numero dei boids: "<<'\n';
   std::cin>>numBoids;
-
   
   std::cout<<"cambiare i coefficienti? (Y : yes   N : no)"<<'\n';
   std::cin>>bruh;
   if ( bruh == 'Y'){  
     std::cout<<"inserire i coefficienti: "<<'\n';
-    std::cin>>a>>s>>c;
+    std::cin>>a>>c>>s;
   }else{
-    a = 1.8;
-    c = 1.3;
-    s = 4.;
+    a = 1.7;
+    c = 3.;
+    s = 6.;
   }
 
   //creazione flock
@@ -95,7 +93,7 @@ int main()
   for (unsigned int i = 0; i != numBoids; i++) {
     std::uniform_real_distribution<double> random_height(200., display_height - 300.);
     std::uniform_real_distribution<double> random_width(200., display_width - 300.);
-    std::uniform_real_distribution<double> random_velocity(-50., 50.);
+    std::uniform_real_distribution<double> random_velocity(-50., 1.);
 
     flock[i].pos.setX(random_width(gen));
     flock[i].pos.setY(random_height(gen));
@@ -104,57 +102,12 @@ int main()
 
     flock[i].N = i;
   }
-  
-  
-  
- /*
- flock[0].pos.setX(150.);
-  flock[0].pos.setY(200.);
-  flock[0].vel.setX(100.);
-  flock[0].vel.setY(0.);
-  flock[0].N = 0;
-
-
-  flock[1].pos.setX(800.);
-  flock[1].pos.setY(200.);
-  flock[1].vel.setX(-100.);
-  flock[1].vel.setY(0.);
-  flock[1].N = 1;
-
-  flock[2].pos.setX(800.);
-  flock[2].pos.setY(210.);
-  flock[2].vel.setX(-100.);
-  flock[2].vel.setY(0.);
-  flock[2].N = 2;
-
-
-  flock[3].pos.setX(810.);
-  flock[3].pos.setY(210.);
-  flock[3].vel.setX(20.);
-  flock[3].vel.setY(0.);
-  flock[3].N = 3;
-
-  flock[4].pos.setX(800.);
-  flock[4].pos.setY(205.);
-  flock[4].vel.setX(20.);
-  flock[4].vel.setY(0.);
-  flock[4].N = 4;
-
-  flock[5].pos.setX(810.);
-  flock[5].pos.setY(200.);
-  flock[5].vel.setX(20.);
-  flock[5].vel.setY(0.);
-  flock[5].N = 5;
-  */
 
   Flock f{flock, a, c, s};
-
   
-  
+  //creazione finestra sfml
   sf::RenderWindow window(sf::VideoMode(display_width, display_height), "Boids simulation");
-  window.setFramerateLimit(30); // Limita a 30 FPS
   window.setVerticalSyncEnabled(true);
-
 
   //caricamento immagine e testi
 
@@ -184,7 +137,7 @@ int main()
 
   //ciclo per stampa continua dei frame
   
-  window.setFramerateLimit(fps);
+  window.setFramerateLimit(30);
   while (window.isOpen()) {
     sf::Event event;
 

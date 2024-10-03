@@ -7,6 +7,7 @@ double Boid::distSquared(Boid const& other) const
                        + (pos.getY() - other.pos.getY()) * (pos.getY() - other.pos.getY());
 }
 
+/*
 //bool operator!=(Boid const& other) const;
 bool Boid::operator!=(Boid const& other) const
 {
@@ -21,7 +22,7 @@ bool Boid::operator==(Boid const& other) const
            (vel.getX() == other.vel.getX()) &&
            (vel.getY() == other.vel.getY());
 }
-
+*/
   
 bool Boid::boidCanSee(Boid const& other, double const& angleOfVision, double const& radOfVision) const
 {
@@ -30,7 +31,6 @@ bool Boid::boidCanSee(Boid const& other, double const& angleOfVision, double con
     }else {
       return false;
     }
-
 }
 
 

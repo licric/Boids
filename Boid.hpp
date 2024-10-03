@@ -15,8 +15,8 @@ struct Boid
   double distSquared(Boid const& other) const;
   bool boidCanSee(Boid const& other, double const& angleOfVision, double const& radOfVision)const;
 
-  bool operator==(Boid const& other) const;
-  bool operator!=(Boid const& other) const;
+  //bool operator==(Boid const& other) const;
+  //bool operator!=(Boid const& other) const;
 
 };
 
