@@ -1,98 +1,113 @@
-#include <random>
 #include "Flock.hpp"
-#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Time.hpp>
 #include <algorithm> //NON li abbiamo usati per ora
+#include <cmath>
+#include <iostream>
+#include <random>
+#include <sstream>
+#include <vector>
 
-//const double s_ {1.8}; //1.8 per 200
-//const double a_ {1.3}; //1.3 per 200
-//const double c_ {1.6}; //1.6 per 200
-
-
-//copiate da loro, da rifare
-/*
-auto meandistance(Flock& flock) {
-  auto uccelli = flock.state();
+// Funzione per calcolare la distanza media tra tutte le coppie di boids
+double meanDistance(Flock const& flock)
+{
+  auto const& boids = flock.flock_; // Accede al vettore di boids
   double sum_distance{0};
-  int h{0};
-  for (unsigned int i = 0; i != uccelli.size() - 1; ++i) {
-    for (unsigned int j = i + 1; j != uccelli.size(); ++j) {
-      auto dx = uccelli[i].P.x - uccelli[j].P.x;
-      auto dy = uccelli[i].P.y - uccelli[j].P.y;
-      sum_distance += std::sqrt((dx * dx) + (dy * dy));
-      ++h;
-    }
-  }
-  auto mean = sum_distance / h;
-  return (mean);
-}
+  int count{0};
 
-auto STD(Flock& flock, double mean) {
-  auto uccelli = flock.state();
-  double d{0.};
-  int h{0};
-  for (unsigned int i = 0; i != uccelli.size() - 1; ++i) {
-    for (unsigned int j = i + 1; j != uccelli.size(); ++j) {
-      auto dx = uccelli[i].P.x - uccelli[j].P.x;
-      auto dy = uccelli[i].P.y - uccelli[j].P.y;
-      double xy = std::sqrt((dx * dx) + (dy * dy));
-
-      d += std::pow((xy - mean), 2);
-      ++h;
+  for (unsigned int i = 0; i < boids.size() - 1; ++i) {
+    for (unsigned int j = i + 1; j < boids.size(); ++j) {
+      double dx       = boids[i].pos.getX() - boids[j].pos.getX();
+      double dy       = boids[i].pos.getY() - boids[j].pos.getY();
+      double distance = std::sqrt(dx * dx + dy * dy);
+      sum_distance += distance;
+      ++count;
     }
   }
 
-  auto STD = std::sqrt(d / (h));
-  return (STD);
-}
-*/
+  if (count == 0) {
+    return 0.0;
+  }
 
+  else {
+    return sum_distance / count;
+  }
+}
+
+// Funzione per calcolare la deviazione standard delle distanze tra tutte le
+// coppie di boids
+double stdDevDistance(Flock const& flock, double mean)
+{
+  auto const& boids = flock.flock_;
+  double sum_squared_diff{0};
+  int count{0};
+
+  for (unsigned int i = 0; i < boids.size() - 1; ++i) {
+    for (unsigned int j = i + 1; j < boids.size(); ++j) {
+      double dx       = boids[i].pos.getX() - boids[j].pos.getX();
+      double dy       = boids[i].pos.getY() - boids[j].pos.getY();
+      double distance = std::sqrt(dx * dx + dy * dy);
+      double diff     = distance - mean;
+      sum_squared_diff += diff * diff;
+      ++count;
+    }
+  }
+
+  if (count == 0) {
+    return 0.0;
+  } else {
+    return std::sqrt(sum_squared_diff / count);
+  }
+}
 
 int main()
 {
-  //display
-  auto const display_width = sf::VideoMode::getDesktopMode().width;
+  // display
+  auto const display_width  = sf::VideoMode::getDesktopMode().width;
   auto const display_height = sf::VideoMode::getDesktopMode().height;
 
   std::cout << "Display width = " << display_width << " ; "
             << "Display height : " << display_height << '\n';
 
-  //variabili
+  // variabili
   auto const delta_t{sf::milliseconds(33)};
-  int const fps = 30;
 
-  //creazione di  "Flock f"
+  // creazione di  "Flock f"
   unsigned int numBoids;
   double a;
   double c;
   double s;
   char bruh;
- 
-  std::cout<<"inserire il numero dei boids: "<<'\n';
-  std::cin>>numBoids;
-  
-  std::cout<<"cambiare i coefficienti? (Y : yes   N : no)"<<'\n';
-  std::cin>>bruh;
-  if ( bruh == 'Y'){  
-    std::cout<<"inserire i coefficienti: "<<'\n';
-    std::cin>>a>>c>>s;
-  }else{
+
+  std::cout << "inserire il numero dei boids: " << '\n';
+  std::cin >> numBoids;
+
+  std::cout << "cambiare i coefficienti? (Y : yes   N : no)" << '\n';
+  std::cin >> bruh;
+  if (bruh == 'Y') {
+    std::cout << "inserire i coefficienti: " << '\n';
+    std::cin >> a >> c >> s;
+  } else {
     a = 1.7;
     c = 3.;
     s = 6.;
   }
 
-  //creazione flock
-  std::vector<Boid> flock(numBoids);  //inizializzazione immediata visto che conosco già grandezza, evita riallocazioni multiple della memoria man mano che riempio 
-  
+  // creazione flock
+  std::vector<Boid> flock(numBoids);
+  // inizializzazione immediata visto che conosco già grandezza,
+  // evita riallocazioni multiple della memoria man mano che
+  // riempio
+
   std::random_device r;
   std::default_random_engine gen{r()};
 
-  //riempimento random
+  // riempimento random
   for (unsigned int i = 0; i != numBoids; i++) {
-    std::uniform_real_distribution<double> random_height(200., display_height - 300.);
-    std::uniform_real_distribution<double> random_width(200., display_width - 300.);
+    std::uniform_real_distribution<double> random_height(200.,
+                                                         display_height - 300.);
+    std::uniform_real_distribution<double> random_width(200.,
+                                                        display_width - 300.);
     std::uniform_real_distribution<double> random_velocity(-50., 1.);
 
     flock[i].pos.setX(random_width(gen));
@@ -104,12 +119,24 @@ int main()
   }
 
   Flock f{flock, a, c, s};
-  
-  //creazione finestra sfml
-  sf::RenderWindow window(sf::VideoMode(display_width, display_height), "Boids simulation");
+
+  // creazione finestra sfml
+  sf::RenderWindow window(sf::VideoMode(display_width, display_height),
+                          "Boids simulation");
   window.setVerticalSyncEnabled(true);
 
-  //caricamento immagine e testi
+  // caricamento immagine e testi
+  sf::Font font;
+  if (!font.loadFromFile("arial.ttf")) {
+    // Gestisci l'errore se il font non viene caricato
+    return -1;
+  }
+
+  sf::Text statsText;
+  statsText.setFont(font);
+  statsText.setCharacterSize(24);
+  statsText.setFillColor(sf::Color::Black);
+  statsText.setPosition(10.f, 10.f); // Posizione del testo nella finestra
 
   sf::Texture texture;
   if (!texture.loadFromFile("../images/Boid.png")) {
@@ -131,37 +158,22 @@ int main()
   sprite1.setTexture(texture1);
   sprite1.setScale(1.17f, 1.17f);
 
-
-
   bool wait = false;
 
-  //ciclo per stampa continua dei frame
-  
+  // ciclo per stampa continua dei frame
+
   window.setFramerateLimit(30);
   while (window.isOpen()) {
     sf::Event event;
 
-   while (window.pollEvent(event)) {
-      if (event.type == sf::Event::Closed) 
-      window.close();
+    while (window.pollEvent(event)) {
+      if (event.type == sf::Event::Closed)
+        window.close();
     }
-
-    /*
-    if (event.key.code == sf::Keyboard::Enter) {
-      wait = true;
-    }
-    
-
-    if (event.key.code == sf::Keyboard::Escape) {
-      wait = false;
-    }
-    */
-
-    if (wait == true) {  // codice quando il gioco è in pausa
+    if (wait == true) { // codice quando il gioco è in pausa
     }
 
     if (wait == false) {
-
       window.clear(sf::Color::White);
       window.draw(sprite1);
 
@@ -169,16 +181,22 @@ int main()
       f.evolve(dt, display_width, display_height);
 
       for (auto& u : f.flock_) {
-        sprite.setPosition(static_cast<float>(u.pos.getX()), static_cast<float>(u.pos.getY()));
+        sprite.setPosition(static_cast<float>(u.pos.getX()),
+                           static_cast<float>(u.pos.getY()));
         double angle = std::atan2(u.vel.getY(), u.vel.getX()) * 180 / M_PI;
         sprite.setRotation(static_cast<float>(angle + 90.));
         window.draw(sprite);
       }
 
-      window.display();
+      double mean    = meanDistance(f);
+      double std_dev = stdDevDistance(f, mean);
 
+      std::stringstream ss;
+      ss << "Distanza media: " << mean << "\nDeviazione standard: " << std_dev;
+      statsText.setString(ss.str());
+
+      window.draw(statsText);
+      window.display();
     }
   }
-
 }
-
