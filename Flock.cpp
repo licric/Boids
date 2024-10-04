@@ -1,7 +1,7 @@
 #include "Flock.hpp"
 // da modificare la posizione di queste
-const double max_velocity = 160.0; // 160
-const double min_velocity = 80.0;  // 80
+const double maxVel = 160.0; // 160
+const double minVel = 80.0;  // 80
 
 Flock::Flock(std::vector<Boid> const& flock, double a, double c, double s)
     : a_{a}
@@ -19,17 +19,25 @@ void Flock::compute(Corrections& corr)
     unsigned int end   = start + neighbors.howMany[N];
     unsigned int countTooClose{0};
 
-    for (unsigned int i = start; i < end; ++i) {
-      if (neighbors.howMany[N] > 1) {
-        corr.cohesion[N] += flock_[neighbors.seen[i]].pos;
-        corr.alignment[N] += flock_[neighbors.seen[i]].vel;
-      }
-      if (flock_[N].isTooClose(flock_[neighbors.seen[i]], 45.)) {
-        corr.separation[N] += flock_[neighbors.seen[i]].pos;
-        countTooClose++;
-      }
-    }
-    if (countTooClose != 0) {
+    corr.cohesion[N] = std::accumulate(
+        neighbors.seen.begin() + start, neighbors.seen.begin() + end, Vec2D(),
+        [&](Vec2D const& acc, unsigned int seenIndex) {
+          return acc + flock_[seenIndex].pos;
+        });
+    corr.alignment[N] = std::accumulate(
+        neighbors.seen.begin() + start, neighbors.seen.begin() + end, Vec2D(),
+        [&](Vec2D const& acc, unsigned int seenIndex) {
+          return acc + flock_[seenIndex].vel;
+        });
+    std::for_each(neighbors.seen.begin() + start, neighbors.seen.begin() + end,
+                  [&](unsigned int neighborIndex) {
+                    if (flock_[N].isTooClose(flock_[neighborIndex], 45.)) {
+                      corr.separation[N] += flock_[neighborIndex].pos;
+                      ++countTooClose;
+                    }
+                  });
+
+    if (countTooClose > 0) {
       corr.separation[N] -= flock_[N].pos * static_cast<double>(countTooClose);
       corr.separation[N] *= -s_;
     }
@@ -43,80 +51,23 @@ void Flock::compute(Corrections& corr)
       corr.cohesion[N] *= c_;
       // QUI HO TOLTO IL -1 PERCHè VEDI NOTION
     }
+
     corr.sumCorr[N] = corr.separation[N] + corr.alignment[N] + corr.cohesion[N];
   }
 }
+
+// parte sostituita con algoritmi
 /*
-if (countCloseBoids != 0) {
-      corr.separation[N] = (corr.separation[N] - flock_[N].pos *
-static_cast<double>(countCloseBoids))* -s_;
+for (unsigned int i = start; i < end; ++i) {
+      if (neighbors.howMany[N] > 1) {
+        corr.cohesion[N] += flock_[neighbors.seen[i]].pos;
+        corr.alignment[N] += flock_[neighbors.seen[i]].vel;
+      }
+      if (flock_[N].isTooClose(flock_[neighbors.seen[i]], 45.)) {
+        corr.separation[N] += flock_[neighbors.seen[i]].pos;
+        countTooClose++;
+      }
     }
-    if (neighbors.howMany[N] > 1) {
-      corr.alignment[N] = (corr.alignment[N]
-/(static_cast<double>(neighbors.howMany[N] - 1)) - flock_[N].vel)* a_;
-      corr.cohesion[N] = (corr.cohesion[N] /
-(static_cast<double>(neighbors.howMany[N])) - flock_[N].pos) * c_;
-*/
-
-// compute() con algoritmi
-/*
-void Flock::compute(Corrections& corr)
-{
-  Neighbors neighbors = findNeighbors(flock_, 90., 300.);
-  for (unsigned int N = 0; N < flock_.size(); ++N) {
-    unsigned int start = neighbors.offset[N];
-    unsigned int end   = start + neighbors.howMany[N];
-
-    // Usa std::accumulate per sommare le posizioni e velocità dei vicini
-    corr.cohesion[N] = std::accumulate(
-        neighbors.seen.begin() + start, neighbors.seen.begin() + end, Vec2D(),
-        [&](Vec2D const& acc, unsigned int seenIndex) {
-          return acc + flock_[seenIndex].pos;
-        });
-    corr.alignment[N] = std::accumulate(
-        neighbors.seen.begin() + start, neighbors.seen.begin() + end, Vec2D(),
-        [&](Vec2D const& acc, unsigned int seenIndex) {
-          return acc + flock_[seenIndex].vel;
-        });
-
-    // Conta quanti boid sono troppo vicini usando std::count_if
-    unsigned int countCloseBoids = std::count_if(
-        neighbors.seen.begin() + start, neighbors.seen.begin() + end,
-        [&](unsigned int neighborIndex) {
-          return isTooClose(flock_[N], flock_[neighborIndex],
-                            tooCloseThreshold);
-        });
-
-    // Calcolo della separazione solo se ci sono boid troppo vicini
-    if (countCloseBoids > 0) {
-      corr.separation[N] = std::accumulate(
-          neighbors.seen.begin() + start, neighbors.seen.begin() + end, Vec2D(),
-          [&](const Vec2& acc, unsigned int neighborIndex) {
-            if (isTooClose(flock_[neighborIndex], tooCloseThreshold)) {
-              return acc + flock_[neighborIndex].pos;
-            }
-            return acc;
-          });
-
-      corr.separation[N] =
-          (corr.separation[N]
-           - flock_[N].pos * static_cast<double>(countCloseBoids))
-          * -s_;
-    }
-
-    // Applicazione dei coefficienti per allineamento e coesione
-    if (neighbors.howMany[N] > 1) {
-      corr.alignment[N] =
-          (corr.alignment[N] / static_cast<double>(neighbors.howMany[N] - 1)
-           - flock_[N].vel)
-          * a_;
-      corr.cohesion[N] =
-          (corr.cohesion[N] / static_cast<double>(neighbors.howMany[N])
-           - flock_[N].pos)
-          * c_;
-    }
-  }
-}
 */
 
 void Flock::evolve(double delta_t, unsigned int display_width,
@@ -126,18 +77,14 @@ void Flock::evolve(double delta_t, unsigned int display_width,
   compute(corr);
 
   for (unsigned int i = 0; i != flock_.size(); ++i) {
-    // limitazione della velocità di sterzo
+    // limitazione della velocità di sterzo se il vettore correzione non è nullo
     if (corr.sumCorr[i].getX() != 0 || corr.sumCorr[i].getY() != 0) {
-      naturalVeer(corr.sumCorr[i], flock_[i].vel);
+      flock_[i].naturalVeer(corr.sumCorr[i]);
     }
     // aggiornamento velocità con correzioni
     flock_[i].vel += corr.sumCorr[i];
     // rinormalizzazione vettore velocità con max e min velocities
-    if (flock_[i].vel.magnitude() > max_velocity) {
-      flock_[i].vel *= max_velocity / flock_[i].vel.magnitude();
-    } else if (flock_[i].vel.magnitude() < min_velocity) {
-      flock_[i].vel *= min_velocity / flock_[i].vel.magnitude();
-    }
+    flock_[i].limitVelMaxMin(maxVel, minVel);
     // aggiornamento posizioni
     flock_[i].pos += flock_[i].vel * delta_t; // aggiornamento posizioni
 
