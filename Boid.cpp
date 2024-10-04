@@ -4,35 +4,22 @@
 double Boid::distSquared(Boid const& other) const
 {
   return (pos.getX() - other.pos.getX()) * (pos.getX() - other.pos.getX())
-                       + (pos.getY() - other.pos.getY()) * (pos.getY() - other.pos.getY());
+       + (pos.getY() - other.pos.getY()) * (pos.getY() - other.pos.getY());
 }
 
-/*
-//bool operator!=(Boid const& other) const;
-bool Boid::operator!=(Boid const& other) const
+bool Boid::boidCanSee(Boid const& other, double angleOfVision,
+                      double radOfVision) const
 {
-    return !(*this == other);
+  if (distSquared(other) < (radOfVision * radOfVision)
+      && vel.angleBetween(other.pos - pos) < angleOfVision) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-
-bool Boid::operator==(Boid const& other) const
+// funzione per determinare se due boid sono troppo vicini
+bool Boid::isTooClose(Boid const& other, double threshold) const
 {
-    return (pos.getX() == other.pos.getX()) &&
-           (pos.getY() == other.pos.getY()) &&
-           (vel.getX() == other.vel.getX()) &&
-           (vel.getY() == other.vel.getY());
+  return distSquared(other) < threshold * threshold;
 }
-*/
-  
-bool Boid::boidCanSee(Boid const& other, double const& angleOfVision, double const& radOfVision) const
-{
-    if (distSquared(other) < (radOfVision*radOfVision) && vel.angleBetween(other.pos - pos) < angleOfVision) {
-      return true;
-    }else {
-      return false;
-    }
-}
-
-
-
-
