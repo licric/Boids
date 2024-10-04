@@ -140,10 +140,10 @@ int main()
 
   sf::Texture texture;
   if (!texture.loadFromFile("../images/Boid.png")) {
-    std::cout << "Could not load texture" << std::endl;
-    window.close();
-    return 0;
+    throw std::runtime_error(
+        "Impossibile caricare la texture '../images/Boid.png'");
   }
+
   sf::Sprite sprite;
   sprite.setTexture(texture);
   sprite.setScale(0.019f, 0.019f);
