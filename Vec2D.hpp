@@ -1,6 +1,7 @@
 #ifndef PVECTOR_HPP
 #define PVECTOR_HPP
 
+#include <algorithm>
 #include <cmath>
 #include <numeric>
 #include <vector>
@@ -47,19 +48,5 @@ class Vec2D
   double dotProduct(Vec2D const& other) const;
 };
 
-// limitazione della velocità di sterzo
-inline void naturalVeer(Vec2D& sumCorr, Vec2D const& vel)
-{
-  double theta = vel.angleBetween(sumCorr);
-  if (theta > 2. && theta < 175.) {
-    sumCorr = sumCorr * (vel.magnitude() / sumCorr.magnitude()) *=
-        std::sin(2. * M_PI / 180.) / std::abs(std::sin(theta * M_PI / 180.));
-  } else if (theta >= 175. && theta <= 180.) {
-    sumCorr.rotate(-10.);
-    double phi = vel.angleBetween(sumCorr);
-    sumCorr = sumCorr * (vel.magnitude() / sumCorr.magnitude()) *=
-        std::sin(2. * M_PI / 180.) / std::abs(std::sin(phi * M_PI / 180.));
-  }
-}
 
 #endif

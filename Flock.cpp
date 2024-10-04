@@ -1,7 +1,7 @@
 #include "Flock.hpp"
 // da modificare la posizione di queste
-const double max_velocity = 160.0; // 160
-const double min_velocity = 80.0;  // 80
+const double maxVel = 160.0; // 160
+const double minVel = 80.0;  // 80
 
 Flock::Flock(std::vector<Boid> const& flock, double a, double c, double s)
     : a_{a}
@@ -77,18 +77,14 @@ void Flock::evolve(double delta_t, unsigned int display_width,
   compute(corr);
 
   for (unsigned int i = 0; i != flock_.size(); ++i) {
-    // limitazione della velocità di sterzo
+    // limitazione della velocità di sterzo se il vettore correzione non è nullo
     if (corr.sumCorr[i].getX() != 0 || corr.sumCorr[i].getY() != 0) {
       naturalVeer(corr.sumCorr[i], flock_[i].vel);
     }
     // aggiornamento velocità con correzioni
     flock_[i].vel += corr.sumCorr[i];
     // rinormalizzazione vettore velocità con max e min velocities
-    if (flock_[i].vel.magnitude() > max_velocity) {
-      flock_[i].vel *= max_velocity / flock_[i].vel.magnitude();
-    } else if (flock_[i].vel.magnitude() < min_velocity) {
-      flock_[i].vel *= min_velocity / flock_[i].vel.magnitude();
-    }
+    
     // aggiornamento posizioni
     flock_[i].pos += flock_[i].vel * delta_t; // aggiornamento posizioni
 
