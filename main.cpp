@@ -143,6 +143,8 @@ int main()
     if (!texture.loadFromFile("../images/Boid.png")) {
       throw std::runtime_error(
           "Impossibile caricare la texture '../images/Boid.png'");
+      window.close();
+      return 0;
     }
 
     sf::Sprite sprite;
@@ -153,9 +155,8 @@ int main()
     if (!texture1.loadFromFile("../images/cielo.jpg")) {
       throw std::runtime_error(
           "Impossibile caricare la texture '../images/Boid.png'");
-      /*std::cout << "Could not load texture" << std::endl;
       window.close();
-      return 0;*/ //bisogna lasciare anche queste? Bisogna fare una funzione catch?
+      return 0; // bisogna lasciare anche queste? Bisogna fare una funzione
     }
     sf::Sprite sprite1;
     sprite1.setTexture(texture1);
@@ -205,6 +206,9 @@ int main()
     }
   } catch (const std::exception& e) {
     std::cerr << "Errore irreversibile: " << e.what() << std::endl;
-    return EXIT_FAILURE; //posizione giusta di catch?
+    return EXIT_FAILURE; // posizione giusta di catch?
+  } catch (...) {
+    std::cerr << "Errore non previsto." << std::endl;
+    return EXIT_FAILURE;
   }
 }
