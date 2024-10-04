@@ -1,5 +1,6 @@
 #include "Boid.hpp"
 #include <cmath>
+#include <stdexcept>
 
 double Boid::distSquared(Boid const& other) const
 {
@@ -7,8 +8,8 @@ double Boid::distSquared(Boid const& other) const
        + (pos.getY() - other.pos.getY()) * (pos.getY() - other.pos.getY());
 }
 
-bool Boid::boidCanSee(Boid const& other, double angleOfVision,
-                      double radOfVision) const
+bool Boid::boidCanSee(Boid const& other, double const& angleOfVision,
+                      double const& radOfVision) const
 {
   if (distSquared(other) < (radOfVision * radOfVision)
       && vel.angleBetween(other.pos - pos) < angleOfVision) {
