@@ -1,6 +1,7 @@
 #include "Vec2D.hpp"
 #include <math.h>
 #include <cmath>
+#include <stdexcept>
 
 double Vec2D::getX() const
 {
@@ -67,6 +68,9 @@ Vec2D Vec2D::operator*(double c) const
 
 Vec2D Vec2D::operator/(double c) const
 {
+  if (c == 0) {
+    throw std::runtime_error("Divisione per zero in Vec2D::operator/.");
+  }
   return Vec2D{x_ / c, y_ / c};
 }
 
@@ -98,6 +102,13 @@ double Vec2D::magnitude() const
 
 double Vec2D::angleBetween(Vec2D const& other) const
 {
-  return std::acos(dotProduct(other) / (magnitude() * other.magnitude()))
-       * (180 / M_PI);
+  if (magnitude() == 0 || other.magnitude() == 0) {
+    throw std::runtime_error(
+        "Impossibile calcolare l'angolo tra vettori con magnitudine zero.");
+  }
+  double cosTheta = dotProduct(other) / (magnitude() * other.magnitude());
+  // Corregge possibili errori numerici che portano cosTheta fuori
+  // dall'intervallo [-1, 1]
+  cosTheta = std::max(-1.0, std::min(1.0, cosTheta));
+  return std::acos(cosTheta) * (180 / M_PI);
 }
