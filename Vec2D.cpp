@@ -97,18 +97,15 @@ double Vec2D::dotProduct(Vec2D const& other) const
 
 double Vec2D::magnitude() const
 {
-  return std::sqrt(x_ * x_ + y_ * y_);
+  double magnitude_ = std::sqrt(x_ * x_ + y_ * y_);
+  if (magnitude_ == 0) {
+    throw std::runtime_error("Magnitude è 0");
+  }
+  return magnitude_;
 }
 
 double Vec2D::angleBetween(Vec2D const& other) const
 {
-  if (magnitude() == 0 || other.magnitude() == 0) {
-    throw std::runtime_error(
-        "Impossibile calcolare l'angolo tra vettori con magnitudine zero.");
-  }
-  double cosTheta = dotProduct(other) / (magnitude() * other.magnitude());
-  // Corregge possibili errori numerici che portano cosTheta fuori
-  // dall'intervallo [-1, 1]
-  cosTheta = std::max(-1.0, std::min(1.0, cosTheta));
-  return std::acos(cosTheta) * (180 / M_PI);
+  return std::acos(dotProduct(other) / (magnitude() * other.magnitude()))
+       * (180 / M_PI);
 }
