@@ -128,7 +128,7 @@ int main()
 
     // caricamento immagine e testi
     sf::Font font;
-    if (!font.loadFromFile("arial.ttf")) {
+    if (!font.loadFromFile("../Boids_programmazione_24/Roboto-Regular.ttf")) {
       // Gestisci l'errore se il font non viene caricato
       return -1;
     }
