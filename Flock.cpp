@@ -79,12 +79,12 @@ void Flock::evolve(double delta_t, unsigned int display_width,
   for (unsigned int i = 0; i != flock_.size(); ++i) {
     // limitazione della velocità di sterzo se il vettore correzione non è nullo
     if (corr.sumCorr[i].getX() != 0 || corr.sumCorr[i].getY() != 0) {
-      naturalVeer(corr.sumCorr[i], flock_[i].vel);
+      flock_[i].naturalVeer(corr.sumCorr[i]);
     }
     // aggiornamento velocità con correzioni
     flock_[i].vel += corr.sumCorr[i];
     // rinormalizzazione vettore velocità con max e min velocities
-    
+    flock_[i].limitVelMaxMin(maxVel, minVel);
     // aggiornamento posizioni
     flock_[i].pos += flock_[i].vel * delta_t; // aggiornamento posizioni
 
