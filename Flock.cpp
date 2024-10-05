@@ -21,18 +21,18 @@ void Flock::compute(Corrections& corr)
 
     corr.cohesion[N] = std::accumulate(
         neighbors.seen.begin() + start, neighbors.seen.begin() + end, Vec2D(),
-        [&](Vec2D const& acc, unsigned int seenIndex) {
-          return acc + flock_[seenIndex].pos;
+        [&](Vec2D const& acc, unsigned int boidSeenIndex) {
+          return acc + flock_[boidSeenIndex].pos;
         });
     corr.alignment[N] = std::accumulate(
         neighbors.seen.begin() + start, neighbors.seen.begin() + end, Vec2D(),
-        [&](Vec2D const& acc, unsigned int seenIndex) {
-          return acc + flock_[seenIndex].vel;
+        [&](Vec2D const& acc, unsigned int boidSeenIndex) {
+          return acc + flock_[boidSeenIndex].vel;
         });
     std::for_each(neighbors.seen.begin() + start, neighbors.seen.begin() + end,
-                  [&](unsigned int neighborIndex) {
-                    if (flock_[N].isTooClose(flock_[neighborIndex], 45.)) {
-                      corr.separation[N] += flock_[neighborIndex].pos;
+                  [&](unsigned int boidSeenIndex) {
+                    if (flock_[N].isTooClose(flock_[boidSeenIndex], 45.)) {
+                      corr.separation[N] += flock_[boidSeenIndex].pos;
                       ++countTooClose;
                     }
                   });
@@ -84,18 +84,18 @@ void Flock::evolve(double delta_t, unsigned int display_width,
     // aggiornamento velocità con correzioni
     flock_[i].vel += corr.sumCorr[i];
     // rinormalizzazione vettore velocità con max e min velocities
+    // non mettiamo un if perchè con tanti boids viene limitata sempre
     flock_[i].limitVelMaxMin(maxVel, minVel);
     // aggiornamento posizioni
     flock_[i].pos += flock_[i].vel * delta_t; // aggiornamento posizioni
 
-    /*
     // spazio chiuso con cornici
-    if (flock_[i].pos.getX() < -100 ) {  //-200
+    if (flock_[i].pos.getX() < -100) { //-200
       flock_[i].pos.setX(0);
       flock_[i].vel.invertX();
     }
     if (flock_[i].pos.getX() > display_width + 100) { //+ 200
-      flock_[i].pos.setX(display_width +100);
+      flock_[i].pos.setX(display_width + 100);
       flock_[i].vel.invertX(); // punto -1.??
     }
     if (flock_[i].pos.getY() < -100) {
@@ -103,11 +103,11 @@ void Flock::evolve(double delta_t, unsigned int display_width,
       flock_[i].vel.invertY();
     }
     if (flock_[i].pos.getY() > display_height + 100) {
-      flock_[i].pos.setY(display_height +100);
+      flock_[i].pos.setY(display_height + 100);
       flock_[i].vel.invertY();
     }
-    */
 
+    /*
     // spazio aperto, toroide
     if (flock_[i].pos.getX() < 0) {
       flock_[i].pos.setX(flock_[i].pos.getX() + display_width);
@@ -121,5 +121,6 @@ void Flock::evolve(double delta_t, unsigned int display_width,
     if (flock_[i].pos.getY() > display_height) {
       flock_[i].pos.setY(flock_[i].pos.getY() - display_height);
     }
+    */
   }
 }
