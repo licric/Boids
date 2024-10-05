@@ -128,15 +128,16 @@ int main()
 
     // caricamento immagine e testi
     sf::Font font;
-    if (!font.loadFromFile("../Boids_programmazione_24/Roboto-Regular.ttf")) {
+    if (!font.loadFromFile("../Roboto-Bold.ttf")) { //
       // Gestisci l'errore se il font non viene caricato
+      std::cout << "Could not load texture" << '\n';
       return -1;
     }
 
     sf::Text statsText;
     statsText.setFont(font);
-    statsText.setCharacterSize(24);
-    statsText.setFillColor(sf::Color::Black);
+    statsText.setCharacterSize(20);
+    statsText.setFillColor(sf::Color::White);
     statsText.setPosition(10.f, 10.f); // Posizione del testo nella finestra
 
     sf::Texture texture;
