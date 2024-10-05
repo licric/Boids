@@ -31,9 +31,9 @@ target_link_libraries(main PRIVATE sfml-graphics)
 #   per disabilitare il testing, passare -DBUILD_TESTING=OFF a cmake durante la fase di configurazione
 if (BUILD_TESTING)
 
-  # aggiungi l'eseguibile all.t
-  # add_executable(all.t all.t.cpp complex.t.cpp)
-  # aggiungi l'eseguibile all.t alla lista dei test
-  # add_test(NAME all.t COMMAND all.t)
+# aggiungi l'eseguibile sample.t
+add_executable(test.t boids_test.cpp Flock.cpp Boid.cpp Vec2D.cpp)
+# aggiungi l'eseguibile sample.t alla lista dei test
+add_test(NAME test.t COMMAND test.t)
 
 endif()
