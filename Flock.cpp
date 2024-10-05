@@ -1,7 +1,5 @@
 #include "Flock.hpp"
-// da modificare la posizione di queste
-const double maxVel = 160.0; // 160
-const double minVel = 80.0;  // 80
+
 
 Flock::Flock(std::vector<Boid> const& flock, double a, double c, double s)
     : a_{a}
@@ -45,11 +43,10 @@ void Flock::compute(Corrections& corr)
       corr.alignment[N] /= static_cast<double>(neighbors.howMany[N] - 1);
       corr.alignment[N] -= flock_[N].vel;
       corr.alignment[N] *= a_;
-
+      // QUI SOTTO HO TOLTO IL -1 PERCHè VEDI NOTION
       corr.cohesion[N] /= static_cast<double>(neighbors.howMany[N]);
       corr.cohesion[N] -= flock_[N].pos;
       corr.cohesion[N] *= c_;
-      // QUI HO TOLTO IL -1 PERCHè VEDI NOTION
     }
 
     corr.sumCorr[N] = corr.separation[N] + corr.alignment[N] + corr.cohesion[N];

@@ -11,6 +11,9 @@ double Boid::distSquared(Boid const& other) const
 bool Boid::boidCanSee(Boid const& other, double const& angleOfVision,
                       double const& radOfVision) const
 {
+  if (angleOfVision < 0 || radOfVision < 0) {
+    throw std::runtime_error{"angle & radius of vision have to be positive"};
+  }
   if (distSquared(other) < (radOfVision * radOfVision)
       && vel.angleBetween(other.pos - pos) < angleOfVision) {
     return true;
@@ -20,9 +23,12 @@ bool Boid::boidCanSee(Boid const& other, double const& angleOfVision,
 }
 
 // funzione per determinare se due boid sono troppo vicini
-bool Boid::isTooClose(Boid const& other, double threshold) const
+bool Boid::isTooClose(Boid const& other, double radTooClose) const
 {
-  return distSquared(other) < threshold * threshold;
+  if (radTooClose < 0) {
+    throw std::runtime_error{"radius tooClose has to be positive"};
+  }
+  return distSquared(other) < radTooClose * radTooClose;
 }
 
 void Boid::limitVelMaxMin(double maxVel, double minVel)
