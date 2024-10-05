@@ -76,8 +76,11 @@ Vec2D Vec2D::operator/(double c) const
 
 void Vec2D::rotate(double angle)
 {
-  x_ = x_ * std::cos(angle * M_PI / 180.) - y_ * std::sin(angle * M_PI / 180.);
-  y_ = x_ * std::sin(angle * M_PI / 180.) + y_ * std::cos(angle * M_PI / 180.);
+  double angleInRad = angle * M_PI / 180.;
+  double x_new      = x_ * std::cos(angleInRad) - y_ * std::sin(angleInRad);
+  double y_new      = x_ * std::sin(angleInRad) + y_ * std::cos(angleInRad);
+  x_                = x_new;
+  y_                = y_new;
 }
 
 void Vec2D::invertX()
@@ -97,11 +100,11 @@ double Vec2D::dotProduct(Vec2D const& other) const
 
 double Vec2D::magnitude() const
 {
-  double magnitude_ = std::sqrt(x_ * x_ + y_ * y_);
-  if (magnitude_ == 0) {
+  double mag = std::sqrt(x_ * x_ + y_ * y_);
+  if (mag == 0) {
     throw std::runtime_error("Magnitude è 0");
   }
-  return magnitude_;
+  return mag;
 }
 
 double Vec2D::angleBetween(Vec2D const& other) const
