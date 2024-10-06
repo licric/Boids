@@ -102,8 +102,8 @@ int main()
 {
   try {
     // display
-    auto const display_width  = sf::VideoMode::getDesktopMode().width;
-    auto const display_height = sf::VideoMode::getDesktopMode().height;
+    auto const display_width  = 1152;
+    auto const display_height = 720;
 
     std::cout << "Display width = " << display_width << " ; "
               << "Display height : " << display_height << '\n';
@@ -201,10 +201,10 @@ int main()
 
     sf::Texture texture;
     if (!texture.loadFromFile("../images/Boid.png")) {
-      throw std::runtime_error(
-          "Impossibile caricare la texture '../images/Boid.png'");
+      std::cerr << "Impossibile caricare la texture '../images/Boid.png'"
+                << std::endl;
       window.close();
-      return 0;
+      return EXIT_FAILURE;
     }
     sf::Sprite sprite;
     sprite.setTexture(texture);
@@ -219,13 +219,16 @@ int main()
     }
     sf::Sprite sprite1;
     sprite1.setTexture(texture1);
+    float scaleX = static_cast<float>(display_width) / texture1.getSize().x;
+    float scaleY = static_cast<float>(display_height) / texture1.getSize().y;
+    sprite1.setScale(scaleX, scaleY);
     sprite1.setScale(1.17f, 1.17f);
 
     bool wait = false;
 
     // ciclo per stampa continua dei frame
 
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(60);
     while (window.isOpen()) {
       sf::Event event;
 
@@ -274,4 +277,5 @@ int main()
     std::cerr << "Errore non previsto." << std::endl;
     return EXIT_FAILURE;
   }
+  return EXIT_SUCCESS;
 }
