@@ -1,7 +1,6 @@
 # Specifications about the key functions of the project
 
 ---
-- [Specifications about the key functions of the project](#specifications-about-the-key-functions-of-the-project)
   - [Flock::compute(Corrections& corr)](#flockcomputecorrections-corr)
   - [Boid::naturalVeer(Vec2D& sumCorr)](#boidnaturalveervec2d-sumcorr)
   - [Come abbiamo gestito i Neighbors](#come-abbiamo-gestito-i-neighbors)
