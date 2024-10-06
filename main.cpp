@@ -35,7 +35,6 @@ double meanDistance(Flock const& flock)
 }
 
 // Funzione per calcolare la deviazione standard delle distanze tra tutte le
-// coppie di boids
 double stdDevDistance(Flock const& flock, double mean)
 {
   auto const& boids = flock.flock_;
