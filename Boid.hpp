@@ -3,7 +3,7 @@
 
 #include "Vec2D.hpp"
 constexpr double maxVel{160.}; 
-constexpr double minVel{80.}; 
+constexpr double minVel{100.}; 
 
 // dobbiamo mettere una classe? forse è meglio
 struct Boid
