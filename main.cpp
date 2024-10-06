@@ -116,7 +116,7 @@ int main()
     double a;
     double c;
     double s;
-    char bruh;
+    char choice;
 
     std::cout << "Inserire il numero dei boids: ";
     while (true) {
@@ -131,8 +131,8 @@ int main()
       }
     }
     std::cout << '\n' << "Cambiare i coefficienti? (y : yes   n : no)" << '\n';
-    std::cin >> bruh;
-    if (bruh == 'y') {
+    std::cin >> choice;
+    /*if (choice == 'y') {
       std::cout << "Inserire i coefficienti..." << '\n' << "a: ";
       std::cin >> a;
       std::cout << '\n' << "c: ";
@@ -143,6 +143,51 @@ int main()
       a = 3.; // 1.8
       c = 3.; // 1.
       s = 7.; // 2.5
+    }*/
+    if (choice == 'y') {
+      std::cout << "Inserire il coefficiente a (intero positivo): ";
+      while (true) {
+        std::cin >> a;
+        if (std::cin.fail() || a <= 0) {
+          std::cin.clear();
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
+                          '\n'); // Ignora i caratteri non validi nel buffer
+          std::cout << "Input non valido. Inserisci un numero intero positivo "
+                       "per a: ";
+        } else {
+          break; // Esci dal ciclo se l'input è valido
+        }
+      }
+      std::cout << "Inserire il coefficiente c (intero positivo): ";
+      while (true) {
+        std::cin >> c;
+        if (std::cin.fail() || c <= 0) {
+          std::cin.clear();
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+          std::cout << "Input non valido. Inserisci un numero intero positivo "
+                       "per c: ";
+        } else {
+          break;
+        }
+      }
+      std::cout << "Inserire il coefficiente s (intero positivo): ";
+      while (true) {
+        std::cin >> s;
+        if (std::cin.fail() || s <= 0) {
+          std::cin.clear();
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+          std::cout << "Input non valido. Inserisci un numero intero positivo "
+                       "per s: ";
+        } else {
+          break;
+        }
+      }
+
+    } else {
+      // Valori di default se non si cambiano i coefficienti
+      a = 3;
+      c = 3;
+      s = 7;
     }
 
     // creazione flock
