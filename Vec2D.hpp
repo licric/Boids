@@ -48,5 +48,4 @@ class Vec2D
   double dotProduct(Vec2D const& other) const;
 };
 
-
 #endif

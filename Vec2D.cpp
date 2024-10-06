@@ -102,7 +102,7 @@ double Vec2D::magnitude() const
 {
   double mag = std::sqrt(x_ * x_ + y_ * y_);
   if (mag == 0) {
-    throw std::runtime_error("Magnitude è 0");
+    throw std::runtime_error("Magnitude is zero");
   }
   return mag;
 }
