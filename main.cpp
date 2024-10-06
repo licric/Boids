@@ -60,7 +60,8 @@ double stdDevDistance(Flock const& flock, double mean)
   }
 }
 
-int main() {
+int main()
+{
   try {
     // display
     auto const display_width  = sf::VideoMode::getDesktopMode().width;
@@ -168,7 +169,6 @@ int main() {
     bool wait = false;
 
     // ciclo per stampa continua dei frame
-
     window.setFramerateLimit(30);
     while (window.isOpen()) {
       sf::Event event;
