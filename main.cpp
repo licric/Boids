@@ -166,9 +166,8 @@ int main()
     window.setVerticalSyncEnabled(true);
 
     // caricamento immagine e testi
-    /*sf::Font font;
-    if (!font.loadFromFile("../Boids_programmazione_24/Roboto-Regular.ttf")) {
     sf::Font font;
+
     if (!font.loadFromFile("../Roboto-Bold.ttf")) { //
       // Gestisci l'errore se il font non viene caricato
       std::cout << "Could not load texture" << '\n';
@@ -180,7 +179,7 @@ int main()
     statsText.setCharacterSize(20);
     statsText.setFillColor(sf::Color::White);
     statsText.setPosition(10.f, 10.f); // Posizione del testo nella finestra
-*/
+
     sf::Texture texture;
     if (!texture.loadFromFile("../images/Boid.png")) {
       throw std::runtime_error(
@@ -234,20 +233,20 @@ int main()
           window.draw(sprite);
         }
 
-        /*double mean    = meanDistance(f);
+        double mean    = meanDistance(f);
         double std_dev = stdDevDistance(f, mean);
         double mean_speed = meanSpeed(f);
         double std_dev_speed = stdDevSpeed(f, mean_speed);
 
         std::stringstream ss;
         ss << "Distanza media: " << mean
-           << "\nDeviazione standard: " << std_dev;
-           << "Velocità media: " << mean_speed << " px/s"
+           << "\nDeviazione standard: " << std_dev
+           << "\nVelocita' media: " << mean_speed << " px/s"
            << "\nDeviazione standard: " << std_dev_speed << " px/s";
 
         statsText.setString(ss.str());
 
-        window.draw(statsText);*/
+        window.draw(statsText);
         window.display();
       }
     }
