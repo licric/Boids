@@ -167,7 +167,7 @@ int main()
     // caricamento immagine e testi
     sf::Font font;
 
-    if (!font.loadFromFile("../Roboto-Bold.ttf")) { //
+    if (!font.loadFromFile("../others/Roboto-Bold.ttf")) { //
       // Gestisci l'errore se il font non viene caricato
       std::cout << "Could not load texture" << '\n';
       return -1;

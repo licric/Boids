@@ -16,7 +16,7 @@ struct Boid
   bool boidCanSee(Boid const& other, double const& angleOfVision,
                   double const& radOfVision) const;
   bool isTooClose(Boid const& other, double threshold) const;
-  void limitVelMaxMin(double maxVel, double minVel);
+  void limitVelMaxMin();
   void naturalVeer(Vec2D& sumCorr);
 
 };

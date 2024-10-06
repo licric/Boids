@@ -101,14 +101,14 @@ TEST_CASE("Boid.hpp")
       Boid b;
       b.vel = Vec2D(1000., 1000.);
 
-      b.limitVelMaxMin(maxVel, minVel);
+      b.limitVelMaxMin();
       CHECK(b.vel.magnitude() == doctest::Approx(maxVel));
       // limit with negative velocities
       b.vel = Vec2D(-300.0, -300.0);
-      b.limitVelMaxMin(maxVel, minVel);
+      b.limitVelMaxMin();
       CHECK(b.vel.magnitude() == doctest::Approx(maxVel));
       b.vel = Vec2D(0.5, 0.5);
-      b.limitVelMaxMin(maxVel, minVel);
+      b.limitVelMaxMin();
       CHECK(b.vel.magnitude() == doctest::Approx(minVel));
   }
   SUBCASE("Natural Veer") {

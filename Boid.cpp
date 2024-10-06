@@ -31,7 +31,7 @@ bool Boid::isTooClose(Boid const& other, double radTooClose) const
   return distSquared(other) < radTooClose * radTooClose;
 }
 
-void Boid::limitVelMaxMin(double maxVel, double minVel)
+void Boid::limitVelMaxMin()
 {
   if (vel.magnitude() > maxVel) {
     vel *= maxVel / vel.magnitude();

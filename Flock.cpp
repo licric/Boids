@@ -82,7 +82,7 @@ void Flock::evolve(double delta_t, unsigned int display_width,
     flock_[i].vel += corr.sumCorr[i];
     // rinormalizzazione vettore velocità con max e min velocities
     // non mettiamo un if perchè con tanti boids viene limitata sempre
-    flock_[i].limitVelMaxMin(maxVel, minVel);
+    flock_[i].limitVelMaxMin();
     // aggiornamento posizioni
     flock_[i].pos += flock_[i].vel * delta_t; // aggiornamento posizioni
 
