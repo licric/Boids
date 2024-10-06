@@ -53,20 +53,6 @@ void Flock::compute(Corrections& corr)
   }
 }
 
-// parte sostituita con algoritmi
-/*
-for (unsigned int i = start; i < end; ++i) {
-      if (neighbors.howMany[N] > 1) {
-        corr.cohesion[N] += flock_[neighbors.seen[i]].pos;
-        corr.alignment[N] += flock_[neighbors.seen[i]].vel;
-      }
-      if (flock_[N].isTooClose(flock_[neighbors.seen[i]], 45.)) {
-        corr.separation[N] += flock_[neighbors.seen[i]].pos;
-        countTooClose++;
-      }
-    }
-*/
-
 void Flock::evolve(double delta_t, unsigned int display_width,
                    unsigned int display_height)
 {
@@ -81,29 +67,32 @@ void Flock::evolve(double delta_t, unsigned int display_width,
     // aggiornamento velocità con correzioni
     flock_[i].vel += corr.sumCorr[i];
     // rinormalizzazione vettore velocità con max e min velocities
-    // non mettiamo un if perchè con tanti boids viene limitata sempre
-    flock_[i].limitVelMaxMin(maxVel, minVel);
+    if (flock_[i].vel.magnitude() > maxVel
+        || flock_[i].vel.magnitude() < minVel) {
+      flock_[i].limitVelMaxMin(maxVel, minVel);
+    }
     // aggiornamento posizioni
     flock_[i].pos += flock_[i].vel * delta_t; // aggiornamento posizioni
 
+    
     // spazio chiuso con cornici
-    if (flock_[i].pos.getX() < -100) { //-200
+    if (flock_[i].pos.getX() < -50) { //-200
       flock_[i].pos.setX(0);
       flock_[i].vel.invertX();
     }
-    if (flock_[i].pos.getX() > display_width + 100) { //+ 200
-      flock_[i].pos.setX(display_width + 100);
+    if (flock_[i].pos.getX() > display_width + 50) { //+ 200
+      flock_[i].pos.setX(display_width + 50);
       flock_[i].vel.invertX(); // punto -1.??
     }
-    if (flock_[i].pos.getY() < -100) {
+    if (flock_[i].pos.getY() < -50) {
       flock_[i].pos.setY(0);
       flock_[i].vel.invertY();
     }
-    if (flock_[i].pos.getY() > display_height + 100) {
-      flock_[i].pos.setY(display_height + 100);
+    if (flock_[i].pos.getY() > display_height + 50) {
+      flock_[i].pos.setY(display_height + 50);
       flock_[i].vel.invertY();
     }
-
+    
     /*
     // spazio aperto, toroide
     if (flock_[i].pos.getX() < 0) {
@@ -119,5 +108,6 @@ void Flock::evolve(double delta_t, unsigned int display_width,
       flock_[i].pos.setY(flock_[i].pos.getY() - display_height);
     }
     */
+    
   }
 }

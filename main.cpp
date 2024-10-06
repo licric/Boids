@@ -127,9 +127,9 @@ int main()
       std::cout << "inserire i coefficienti: " << '\n';
       std::cin >> a >> c >> s;
     } else {
-      a = 1.7;
-      c = 3.;
-      s = 6.;
+      a = 3.; // 1.7
+      c = 3.; // 3.
+      s = 7.; // 6.
     }
 
     // creazione flock
@@ -143,18 +143,26 @@ int main()
 
     // riempimento random
     for (unsigned int i = 0; i != numBoids; i++) {
-      std::uniform_real_distribution<double> random_height(200., display_height
-                                                                     - 300.);
-      std::uniform_real_distribution<double> random_width(200.,
-                                                          display_width - 300.);
-      std::uniform_real_distribution<double> random_velocity(-50., 1.);
 
-      flock[i].pos.setX(random_width(gen));
-      flock[i].pos.setY(random_height(gen));
-      flock[i].vel.setX(random_velocity(gen));
-      flock[i].vel.setY(random_velocity(gen));
-
-      flock[i].N = i;
+      if (i < numBoids / 2) {
+        std::uniform_real_distribution<double> random_height(200., 400);
+        std::uniform_real_distribution<double> random_width(200., 400.);
+        std::uniform_real_distribution<double> random_velocity(-50., 50.);
+        flock[i].pos.setX(random_width(gen));
+        flock[i].pos.setY(random_height(gen));
+        flock[i].vel.setX(random_velocity(gen));
+        flock[i].vel.setY(random_velocity(gen));
+        flock[i].N = i;
+      }else{
+        std::uniform_real_distribution<double> random_height(200., 400.);
+        std::uniform_real_distribution<double> random_width(800., 1000.);
+        std::uniform_real_distribution<double> random_velocity(-50., 50.);
+        flock[i].pos.setX(random_width(gen));
+        flock[i].pos.setY(random_height(gen));
+        flock[i].vel.setX(random_velocity(gen));
+        flock[i].vel.setY(random_velocity(gen));
+        flock[i].N = i;
+      }
     }
 
     Flock f{flock, a, c, s};
@@ -167,7 +175,7 @@ int main()
     // caricamento immagine e testi
     sf::Font font;
 
-    if (!font.loadFromFile("../Roboto-Bold.ttf")) { //
+    if (!font.loadFromFile("../others/Roboto-Bold.ttf")) { //
       // Gestisci l'errore se il font non viene caricato
       std::cout << "Could not load texture" << '\n';
       return -1;
@@ -232,14 +240,13 @@ int main()
           window.draw(sprite);
         }
 
-        double mean    = meanDistance(f);
-        double std_dev = stdDevDistance(f, mean);
-        double mean_speed = meanSpeed(f);
+        double mean          = meanDistance(f);
+        double std_dev       = stdDevDistance(f, mean);
+        double mean_speed    = meanSpeed(f);
         double std_dev_speed = stdDevSpeed(f, mean_speed);
 
         std::stringstream ss;
-        ss << "Distanza media: " << mean
-           << "\nDeviazione standard: " << std_dev
+        ss << "Distanza media: " << mean << "\nDeviazione standard: " << std_dev
            << "\nVelocita' media: " << mean_speed << " px/s"
            << "\nDeviazione standard: " << std_dev_speed << " px/s";
 
