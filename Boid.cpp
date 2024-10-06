@@ -44,13 +44,13 @@ void Boid::limitVelMaxMin()
 void Boid::naturalVeer(Vec2D& sumCorr)
 {
   double theta = vel.angleBetween(sumCorr);
-  if (theta > 3. && theta < 175.) {
+  if (theta > 4. && theta < 172.) {
     sumCorr = sumCorr * (vel.magnitude() / sumCorr.magnitude()) *=
-        std::sin(3. * M_PI / 180.) / std::abs(std::sin(theta * M_PI / 180.));
-  } else if (theta >= 175. && theta <= 180.) {
-    sumCorr.rotate(-10.);
+        std::sin(4. * M_PI / 180.) / std::abs(std::sin(theta * M_PI / 180.));
+  } else if (theta >= 172. && theta <= 180.) {
+    sumCorr.rotate(-15.);
     double phi = vel.angleBetween(sumCorr);
     sumCorr    = sumCorr * (vel.magnitude() / sumCorr.magnitude()) *=
-        std::sin(3. * M_PI / 180.) / std::abs(std::sin(phi * M_PI / 180.));
+        std::sin(4. * M_PI / 180.) / std::abs(std::sin(phi * M_PI / 180.));
   }
 }
