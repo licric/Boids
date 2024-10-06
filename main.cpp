@@ -60,6 +60,45 @@ double stdDevDistance(Flock const& flock, double mean)
   }
 }
 
+// Funzione per calcolare la velocità media di tutti i boids
+double meanSpeed(Flock const& flock)
+{
+  auto const& boids = flock.flock_; // Accede al vettore di boids
+  double sum_speed{0};
+  long unsigned int count = boids.size();
+
+  for (const auto& boid : boids) {
+    sum_speed +=
+        boid.vel.magnitude(); // Somma le velocità (modulo del vettore velocità)
+  }
+
+  if (count == 0) {
+    return 0.0;
+  } else {
+    return sum_speed / static_cast<double>(count);
+  }
+}
+
+// Funzione per calcolare la deviazione standard delle velocità
+double stdDevSpeed(Flock const& flock, double mean)
+{
+  auto const& boids = flock.flock_;
+  double sum_squared_diff{0};
+  long unsigned int count = boids.size();
+
+  for (const auto& boid : boids) {
+    double speed = boid.vel.magnitude();
+    double diff  = speed - mean;
+    sum_squared_diff += diff * diff;
+  }
+
+  if (count == 0) {
+    return 0.0;
+  } else {
+    return std::sqrt(sum_squared_diff / static_cast<double>(count));
+  }
+}
+
 int main()
 {
   try {
@@ -197,10 +236,15 @@ int main()
 
         /*double mean    = meanDistance(f);
         double std_dev = stdDevDistance(f, mean);
+        double mean_speed = meanSpeed(f);
+        double std_dev_speed = stdDevSpeed(f, mean_speed);
 
         std::stringstream ss;
         ss << "Distanza media: " << mean
            << "\nDeviazione standard: " << std_dev;
+           << "Velocità media: " << mean_speed << " px/s"
+           << "\nDeviazione standard: " << std_dev_speed << " px/s";
+
         statsText.setString(ss.str());
 
         window.draw(statsText);*/
