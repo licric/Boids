@@ -10,17 +10,7 @@
 
 Le regole per le correzioni sono: 
 
-$$
-\vec{v}_{sep} = -s\sum_{j\ne i}(\vec{x}_{b_j}-\vec{x}_{b_i})=-s(\sum_{j\ne i}\vec{x}_{b_j}-N_{neigh}\cdot \vec{x}_{bi})
-$$
-
-$$
-\vec{v}_{all} = a(\frac{1}{n-1}\sum_{j\ne i}\vec{v}_{b_j} - \vec{v}_{b_i})
-$$
-
-$$
-\vec{v}_{coe} = c(\vec{x}_{cm}-\vec{x}_{b_i})
-$$
+![](/images/correzioni.png)
 
 Nella funzione in esame il ciclo for scorre i Boids del flock e le variabili sottostanti servono per leggere i vicini per ogni Boid dal vettore `neighbors.seen` . I due algoritmi seguenti:
 
