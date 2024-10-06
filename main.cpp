@@ -118,18 +118,31 @@ int main()
     double s;
     char bruh;
 
-    std::cout << "inserire il numero dei boids: " << '\n';
-    std::cin >> numBoids;
-
-    std::cout << "cambiare i coefficienti? (Y : yes   N : no)" << '\n';
+    std::cout << "Inserire il numero dei boids: ";
+    while (true) {
+      std::cin >> numBoids;
+      if (std::cin.fail()) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Input non valido. Per favore, inserisci un numero intero "
+                     "positivo: ";
+      } else {
+        break;
+      }
+    }
+    std::cout << '\n' << "Cambiare i coefficienti? (y : yes   n : no)" << '\n';
     std::cin >> bruh;
-    if (bruh == 'Y') {
-      std::cout << "inserire i coefficienti: " << '\n';
-      std::cin >> a >> c >> s;
+    if (bruh == 'y') {
+      std::cout << "Inserire i coefficienti..." << '\n' << "a: ";
+      std::cin >> a;
+      std::cout << '\n' << "c: ";
+      std::cin >> c;
+      std::cout << '\n' << "s: ";
+      std::cin >> s;
     } else {
-      a = 3.; // 1.7
-      c = 3.; // 3.
-      s = 7.; // 6.
+      a = 3.; // 1.8
+      c = 3.; // 1.
+      s = 7.; // 2.5
     }
 
     // creazione flock
@@ -143,19 +156,18 @@ int main()
 
     // riempimento random
     for (unsigned int i = 0; i != numBoids; i++) {
-
       if (i < numBoids / 2) {
-        std::uniform_real_distribution<double> random_height(200., 400);
-        std::uniform_real_distribution<double> random_width(200., 400.);
+        std::uniform_real_distribution<double> random_height(200., 600);
+        std::uniform_real_distribution<double> random_width(100., 500.);
         std::uniform_real_distribution<double> random_velocity(-50., 50.);
         flock[i].pos.setX(random_width(gen));
         flock[i].pos.setY(random_height(gen));
         flock[i].vel.setX(random_velocity(gen));
         flock[i].vel.setY(random_velocity(gen));
         flock[i].N = i;
-      }else{
-        std::uniform_real_distribution<double> random_height(200., 400.);
-        std::uniform_real_distribution<double> random_width(800., 1000.);
+      } else {
+        std::uniform_real_distribution<double> random_height(200., 600.);
+        std::uniform_real_distribution<double> random_width(700., 1100.);
         std::uniform_real_distribution<double> random_velocity(-50., 50.);
         flock[i].pos.setX(random_width(gen));
         flock[i].pos.setY(random_height(gen));
@@ -194,10 +206,9 @@ int main()
       window.close();
       return 0;
     }
-
     sf::Sprite sprite;
     sprite.setTexture(texture);
-    sprite.setScale(0.019f, 0.019f);
+    sprite.setScale(0.017f, 0.017f);
 
     sf::Texture texture1;
     if (!texture1.loadFromFile("../images/cielo.jpg")) {
