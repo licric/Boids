@@ -15,7 +15,7 @@ struct Boid
   double distSquared(Boid const& other) const;
   bool boidCanSee(Boid const& other, double const& angleOfVision,
                   double const& radOfVision) const;
-  bool isTooClose(Boid const& other, double threshold) const;
+  bool isTooClose(Boid const& other, double radTooClose) const;
   void limitVelMaxMin();
   void naturalVeer(Vec2D& sumCorr);
 
