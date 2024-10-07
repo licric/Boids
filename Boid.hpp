@@ -2,8 +2,8 @@
 #define BOID_HPP
 
 #include "Vec2D.hpp"
-constexpr double maxVel{130.}; 
-constexpr double minVel{90.}; 
+constexpr double maxVel{110.}; 
+constexpr double minVel{80.}; 
 
 // dobbiamo mettere una classe? forse è meglio
 struct Boid

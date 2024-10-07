@@ -43,7 +43,7 @@ void Flock::compute(Corrections& corr)
       corr.alignment[N] /= static_cast<double>(neighbors.howMany[N] - 1);
       corr.alignment[N] -= flock_[N].vel;
       corr.alignment[N] *= a_;
-      // QUI SOTTO HO TOLTO IL -1 PERCHè VEDI NOTION
+
       corr.cohesion[N] /= static_cast<double>(neighbors.howMany[N]);
       corr.cohesion[N] -= flock_[N].pos;
       corr.cohesion[N] *= c_;
@@ -74,7 +74,7 @@ void Flock::evolve(double delta_t, unsigned int display_width,
     // aggiornamento posizioni
     flock_[i].pos += flock_[i].vel * delta_t; // aggiornamento posizioni
 
-
+    /*
     // spazio chiuso con cornici
     if (flock_[i].pos.getX() < -50) { //-200
       flock_[i].pos.setX(0);
@@ -92,8 +92,8 @@ void Flock::evolve(double delta_t, unsigned int display_width,
       flock_[i].pos.setY(display_height + 50);
       flock_[i].vel.invertY();
     }
+    */
     
-    /*
     // spazio aperto, toroide
     if (flock_[i].pos.getX() < 0) {
       flock_[i].pos.setX(flock_[i].pos.getX() + display_width);
@@ -107,7 +107,7 @@ void Flock::evolve(double delta_t, unsigned int display_width,
     if (flock_[i].pos.getY() > display_height) {
       flock_[i].pos.setY(flock_[i].pos.getY() - display_height);
     }
-    */
+    
     
   }
 }
