@@ -1,7 +1,7 @@
 #ifndef FLOCK_HPP
 #define FLOCK_HPP
 
-#include "Neighbors.hpp" 
+#include "Neighbors.hpp"
 
 struct Corrections
 {
@@ -25,11 +25,14 @@ class Flock
   double a_{};
   double c_{};
   double s_{};
+  double radOfVision_{};
+  double radTooClose_{};
 
  public:
   std::vector<Boid> flock_; // questo lo devo poter modificare
 
-  Flock(std::vector<Boid> const& flock, double a, double c, double s);
+  Flock(std::vector<Boid> const& flock, double a, double c, double s,
+        double radOfVision, double radTooClose);
 
   void compute(Corrections& corr);
   void evolve(double delta_t, unsigned int display_width,
