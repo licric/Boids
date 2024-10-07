@@ -1,13 +1,10 @@
-#include "Flock.hpp"
+#include "../headers/Flock.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Time.hpp>
-#include <algorithm>
-#include <cmath>
 #include <iostream>
 #include <random>
 #include <sstream>
 #include <stdexcept>
-#include <vector>
 
 // Functions to calculate the stats about positions of boids
 std::pair<double, double> meanAndStdDevDistance(Flock const& f)
@@ -22,20 +19,19 @@ std::pair<double, double> meanAndStdDevDistance(Flock const& f)
       double dx       = boids[i].pos.getX() - boids[j].pos.getX();
       double dy       = boids[i].pos.getY() - boids[j].pos.getY();
       double distance = std::sqrt(dx * dx + dy * dy);
-      // Sommiamo le distanze totali
       sum_distance += distance;
       ++count;
-      // Incrementiamo la somma delle differenze quadrate rispetto alla med...
+
       double mean_so_far = sum_distance / count;
       double diff        = distance - mean_so_far;
       sum_squared_diff += diff * diff;
     }
   }
   if (count == 0) {
-    return {0.0, 0.0}; // Caso in cui ci siano zero boid
+    return {0.0, 0.0};
   }
-  double mean     = sum_distance / count;     // Calcoliamo la media finale
-  double variance = sum_squared_diff / count; // La varianza
+  double mean     = sum_distance / count;
+  double variance = sum_squared_diff / count;
 
   return {mean, std::sqrt(variance)};
 }
@@ -51,7 +47,7 @@ std::pair<double, double> meanAndStdDevSpeed(Flock const& flock)
   for (const auto& boid : boids) {
     double speed = boid.vel.magnitude();
     sum_speed += speed;
-    // Calcoliamo la media parziale e aggiorniamo le differenze quadrate
+
     double mean_so_far = sum_speed / (boid.N + 1);
     double diff        = speed - mean_so_far;
     sum_squared_diff += diff * diff;
@@ -59,8 +55,8 @@ std::pair<double, double> meanAndStdDevSpeed(Flock const& flock)
   if (count == 0) {
     return {0.0, 0.0};
   }
-  double mean     = sum_speed / static_cast<double>(count); // Media finale
-  double variance = sum_squared_diff / static_cast<double>(count); // Varianza
+  double mean     = sum_speed / static_cast<double>(count);
+  double variance = sum_squared_diff / static_cast<double>(count);
 
   return {mean, std::sqrt(variance)};
 }
@@ -68,13 +64,13 @@ std::pair<double, double> meanAndStdDevSpeed(Flock const& flock)
 int main()
 {
   try {
-    // fixed display size
+    // fixed display size since otherwise it gives rendering problems
     auto const dispWidth  = 1152;
     auto const dispHeight = 720;
     std::cout << "Display width = " << dispWidth << " ; "
               << "Display height : " << dispHeight << '\n';
 
-    // gathering the parameters
+    // parameters
     unsigned int numBoids;
     double a;
     double c;
@@ -84,110 +80,106 @@ int main()
 
     char choice;
 
-    const double MIN_COEFF = 0.1;  // Valore minimo accettabile
-    const double MAX_COEFF = 10.0; // Valore massimo accettabile
+    const double MIN_COEFF = 0.1;  // Minimum acceptable value
+    const double MAX_COEFF = 10.0; // Maximum acceptable value
 
-    // Input del numero di boid
-    std::cout << "Questo è un programma che simula l'andamento dei boids "
-                 "secondo il modello di Craig Reynolds\n"
-              << "E' possibile successivamente scegliere i parametri "
-                 "fondamentali della simulazione oppure \n"
-              << "eseguire il programma con i parametri di default (scegliendo "
-                 "di non cambiarli)\n\n\n";
-    std::cout << "Inserire il numero dei boids (intero positivo): ";
+    std::cout << "This is a program that simulates the behavior of boids "
+                 "according to Craig Reynolds' model\n"
+              << "You can later choose the fundamental parameters of the "
+                 "simulation or \n"
+              << "run the program with default parameters (by choosing not to "
+                 "change them)\n\n\n";
+    std::cout << "Enter the number of boids (positive integer): ";
     while (true) {
       std::cin >> numBoids;
       if (std::cin.fail() || numBoids <= 0) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Input non valido. Per favore, inserisci un numero intero "
-                     "positivo: ";
+        std::cout << "Invalid input. Please enter a positive integer: ";
       } else {
         break;
       }
     }
-    // Chiedi se l'utente vuole cambiare i coefficienti
     while (true) {
-      std::cout << "\nCambiare i coefficienti? (y : yes   n : no): ";
+      std::cout << "\nChange the coefficients? (y : yes   n : no): ";
       std::cin >> choice;
       if (choice == 'y') {
-        // Input del coefficiente a
-        std::cout << "Inserire il coefficiente a (double positivo tra "
-                  << MIN_COEFF << " e " << MAX_COEFF << "): ";
+        // Input coefficient a
+        std::cout << "Enter coefficient a (positive double between "
+                  << MIN_COEFF << " and " << MAX_COEFF << "): ";
         while (true) {
           std::cin >> a;
           if (std::cin.fail() || a < MIN_COEFF || a > MAX_COEFF) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Input non valido. Inserisci un valore double "
-                         "positivo per a tra "
-                      << MIN_COEFF << " e " << MAX_COEFF << ": ";
+            std::cout
+                << "Invalid input. Enter a positive double value for a between "
+                << MIN_COEFF << " and " << MAX_COEFF << ": ";
           } else {
             break;
           }
         }
-        // Input del coefficiente c
-        std::cout << "Inserire il coefficiente c (double positivo tra "
-                  << MIN_COEFF << " e " << MAX_COEFF << "): ";
+        std::cout << "Enter coefficient c (positive double between "
+                  << MIN_COEFF << " and " << MAX_COEFF << "): ";
         while (true) {
           std::cin >> c;
           if (std::cin.fail() || c < MIN_COEFF || c > MAX_COEFF) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Input non valido. Inserisci un valore double "
-                         "positivo per c tra "
-                      << MIN_COEFF << " e " << MAX_COEFF << ": ";
+            std::cout
+                << "Invalid input. Enter a positive double value for c between "
+                << MIN_COEFF << " and " << MAX_COEFF << ": ";
           } else {
             break;
           }
         }
-        // Input del coefficiente s
-        std::cout << "Inserire il coefficiente s (double positivo tra "
-                  << MIN_COEFF << " e " << MAX_COEFF << "): ";
+        std::cout << "Enter coefficient s (positive double between "
+                  << MIN_COEFF << " and " << MAX_COEFF << "): ";
         while (true) {
           std::cin >> s;
           if (std::cin.fail() || s < MIN_COEFF || s > MAX_COEFF) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Input non valido. Inserisci un valore double "
-                         "positivo per s tra "
-                      << MIN_COEFF << " e " << MAX_COEFF << ": ";
+            std::cout
+                << "Invalid input. Enter a positive double value for s between "
+                << MIN_COEFF << " and " << MAX_COEFF << ": ";
           } else {
             break;
           }
         }
-        std::cout << "Inserire il raggio di separazione:";
+        std::cout << "Enter the separation radius:";
         while (true) {
           std::cin >> radTooClose;
           if (std::cin.fail()) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Input non valido. Inserisci un valore double:";
+            std::cout << "Invalid input. Enter a double value:";
           } else {
             break;
           }
         }
-        std::cout << "Inserire il raggio di visione:";
+        std::cout << "Enter the vision radius:";
         while (true) {
           std::cin >> radOfVision;
-          if (std::cin.fail() || radOfVision > radTooClose) {
+          if (std::cin.fail() || radOfVision < radTooClose) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Input non valido. Inserisci un valore double:";
+            std::cout << "Invalid input. Enter a double value:";
           } else {
             break;
           }
         }
-        break; // Esci dal ciclo dopo aver impostato i coefficienti
+        break; 
       } else if (choice == 'n') {
-        // Valori di default se non si cambiano i coefficienti
+        // Default values if the coefficients are not changed
         a = 1.8;
         c = 1.0;
-        s = 2.5;
-        break; // Esci dal ciclo
+        s = 3.5;
+        radOfVision = 300.;
+        radTooClose = 45.;
+        break; 
       } else {
-        std::cout << "Scelta non valida. Per favore, inserisci 'y' o 'n'.\n";
-        // Il ciclo ripete la domanda
+        std::cout << "Invalid choice. Please enter 'y' or 'n'.\n";
       }
     }
 
@@ -218,7 +210,7 @@ int main()
       }
     }
 
-    Flock f{flock, a, c, s, radOfVision, radOfVision};
+    Flock f{flock, a, c, s, radOfVision, radTooClose};
 
     // rendering the sfml window
     sf::RenderWindow window(sf::VideoMode(dispWidth, dispHeight),
@@ -239,8 +231,7 @@ int main()
 
     sf::Texture texture;
     if (!texture.loadFromFile("../images/Boid.png")) {
-      std::cerr << "Impossibile caricare la texture '../images/Boid.png'"
-                << std::endl;
+      std::cerr << "Unable to load texture '../images/Boid.png'" << std::endl;
       window.close();
       return EXIT_FAILURE;
     }
@@ -250,8 +241,7 @@ int main()
 
     sf::Texture texture1;
     if (!texture1.loadFromFile("../images/cielo.jpg")) {
-      throw std::runtime_error(
-          "Impossibile caricare la texture '../images/Boid.png'");
+      throw std::runtime_error("Unable to load texture '../images/Boid.png'");
       window.close();
       return 0;
     }
@@ -259,7 +249,7 @@ int main()
     sprite1.setTexture(texture1);
     sprite1.setScale(1.17f, 1.17f);
 
-    // loop for evolving and frame printing process
+    // loop for evolving the flock and frame printing process
     window.setFramerateLimit(60);
     auto const delta_t{sf::milliseconds(33)};
 
@@ -289,10 +279,10 @@ int main()
       std::pair<double, double> statDist  = meanAndStdDevDistance(f);
       std::pair<double, double> statSpeed = meanAndStdDevSpeed(f);
       std::stringstream ss;
-      ss << "Distanza media: " << statDist.first
-         << "\nDeviazione standard: " << statDist.second
-         << "\nVelocita' media: " << statSpeed.first << " px/s"
-         << "\nDeviazione standard: " << statSpeed.second << " px/s";
+      ss << "Average distance: " << statDist.first
+         << "\nStandard deviation: " << statDist.second
+         << "\nAverage speed: " << statSpeed.first << " px/s"
+         << "\nStandard deviation: " << statSpeed.second << " px/s";
       statsText.setString(ss.str());
 
       window.draw(statsText);
@@ -300,10 +290,10 @@ int main()
     }
 
   } catch (const std::exception& e) {
-    std::cerr << "Errore irreversibile: " << e.what() << std::endl;
-    return EXIT_FAILURE; // posizione giusta di catch?
+    std::cerr << "Unrecoverable error: " << e.what() << std::endl;
+    return EXIT_FAILURE;
   } catch (...) {
-    std::cerr << "Errore non previsto." << std::endl;
+    std::cerr << "Unexpected error." << std::endl;
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
