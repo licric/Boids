@@ -74,7 +74,7 @@ void Flock::evolve(double delta_t, unsigned int display_width,
     // aggiornamento posizioni
     flock_[i].pos += flock_[i].vel * delta_t; // aggiornamento posizioni
 
-    
+
     // spazio chiuso con cornici
     if (flock_[i].pos.getX() < -50) { //-200
       flock_[i].pos.setX(0);
