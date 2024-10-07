@@ -64,77 +64,81 @@ TEST_CASE("Test cases for Vec2D")
 
 TEST_CASE("Boid.hpp")
 {
-  SUBCASE(" boidCanSee() & isTooClose() ") {
-      Boid b1;
-      b1.pos = Vec2D(0., 0.);
-      b1.vel = Vec2D(1., 0.); 
-      Boid b2;
-      b2.pos = Vec2D(100., 100.);
-      Boid b3;
-      b3.pos = Vec2D(100., -100.);
-      // can see b2 within 60 degrees and 200 units
-      CHECK(b1.boidCanSee(b2, 60., 200.) == true);
-      CHECK(b1.boidCanSee(b3, 60., 200.) == true);
-      // cannot see b2 and b3 if angleOfVision < 45.
-      CHECK(b1.boidCanSee(b2, 30., 200.) == false);
-      CHECK(b1.boidCanSee(b3, 30., 200.) == false); 
-      // cannot see b2 if outside radius of vision
-      CHECK(b1.boidCanSee(b2, 70., 50.) == false);
-      b2.pos = Vec2D(-100., 0.);
-      CHECK(b1.boidCanSee(b2, 70., 200.) == false);
-      // b2 is too close
-      b2.pos = Vec2D(20., 0.);
-      CHECK(b1.isTooClose(b2, 45.) == true);
-      // check throws
-      try {
-        b1.isTooClose(b2, -45.);
-      } catch (const std::runtime_error& e) {
-        CHECK(std::string(e.what()) == "radius tooClose has to be positive");
-      }
-      try {
-        b1.boidCanSee(b2, -70. , -400.);
-      } catch (const std::runtime_error& e) {
-        CHECK(std::string(e.what()) == "angle & radius of vision have to be positive");
-      }
-  }
-  SUBCASE("Limit Velocity Max Min") {
-      Boid b;
-      b.vel = Vec2D(1000., 1000.);
-
-      b.limitVelMaxMin();
-      CHECK(b.vel.magnitude() == doctest::Approx(maxVel));
-      // limit with negative velocities
-      b.vel = Vec2D(-300.0, -300.0);
-      b.limitVelMaxMin();
-      CHECK(b.vel.magnitude() == doctest::Approx(maxVel));
-      b.vel = Vec2D(0.5, 0.5);
-      b.limitVelMaxMin();
-      CHECK(b.vel.magnitude() == doctest::Approx(minVel));
-  }
-  SUBCASE("Natural Veer") {
-      Boid b;
-      b.vel = Vec2D(100., 0.); 
-      // The angleBetween is 90 degrees
-      Vec2D sumCorr(0.0, 1.0); 
-      b.naturalVeer(sumCorr);
-      double theta = b.vel.angleBetween(sumCorr);
-      CHECK(theta >= 3.0);
-      CHECK(theta <= 177.0);    
-       // The angleBetween is 180 degrees 
-      sumCorr = Vec2D(-1.0, 0.0); 
-      b.naturalVeer(sumCorr);
-      theta = b.vel.angleBetween(sumCorr);
-      CHECK(theta >= 3.0);
-      CHECK(theta <= 177.0);
-      // check throws
-      sumCorr = Vec2D(0., 0.); 
-      try {
-      b.naturalVeer(sumCorr);
-      } catch (const std::runtime_error& e) {
-        // magnitude throw should come out
-        CHECK(std::string(e.what()) == "Magnitude is zero");
-      }
+  SUBCASE(" boidCanSee() & isTooClose() ")
+  {
+    Boid b1;
+    b1.pos = Vec2D(0., 0.);
+    b1.vel = Vec2D(1., 0.);
+    Boid b2;
+    b2.pos = Vec2D(100., 100.);
+    Boid b3;
+    b3.pos = Vec2D(100., -100.);
+    // can see b2 within 60 degrees and 200 units
+    CHECK(b1.boidCanSee(b2, 60., 200.) == true);
+    CHECK(b1.boidCanSee(b3, 60., 200.) == true);
+    // cannot see b2 and b3 if angleOfVision < 45.
+    CHECK(b1.boidCanSee(b2, 30., 200.) == false);
+    CHECK(b1.boidCanSee(b3, 30., 200.) == false);
+    // cannot see b2 if outside radius of vision
+    CHECK(b1.boidCanSee(b2, 70., 50.) == false);
+    b2.pos = Vec2D(-100., 0.);
+    CHECK(b1.boidCanSee(b2, 70., 200.) == false);
+    // b2 is too close
+    b2.pos = Vec2D(20., 0.);
+    CHECK(b1.isTooClose(b2, 45.) == true);
+    // check throws
+    try {
+      b1.isTooClose(b2, -45.);
+    } catch (const std::runtime_error& e) {
+      CHECK(std::string(e.what()) == "radius tooClose has to be positive");
     }
+    try {
+      b1.boidCanSee(b2, -70., -400.);
+    } catch (const std::runtime_error& e) {
+      CHECK(std::string(e.what())
+            == "angle & radius of vision have to be positive");
+    }
+  }
+  SUBCASE("Limit Velocity Max Min")
+  {
+    Boid b;
+    b.vel = Vec2D(1000., 1000.);
+
+    b.limitVelMaxMin();
+    CHECK(b.vel.magnitude() == doctest::Approx(maxVel));
+    // limit with negative velocities
+    b.vel = Vec2D(-300.0, -300.0);
+    b.limitVelMaxMin();
+    CHECK(b.vel.magnitude() == doctest::Approx(maxVel));
+    b.vel = Vec2D(0.5, 0.5);
+    b.limitVelMaxMin();
+    CHECK(b.vel.magnitude() == doctest::Approx(minVel));
+  }
+  SUBCASE("Natural Veer")
+  {
+    Boid b;
+    b.vel = Vec2D(100., 0.);
+    // The angleBetween is 90 degrees
+    Vec2D sumCorr(0.0, 1.0);
+    b.naturalVeer(sumCorr);
+    double theta = b.vel.angleBetween(sumCorr);
+    CHECK(theta >= 3.0);
+    CHECK(theta <= 177.0);
+    // The angleBetween is 180 degrees
+    sumCorr = Vec2D(-1.0, 0.0);
+    b.naturalVeer(sumCorr);
+    theta = b.vel.angleBetween(sumCorr);
+    CHECK(theta >= 3.0);
+    CHECK(theta <= 177.0);
+    // check throws
+    sumCorr = Vec2D(0., 0.);
+    try {
+      b.naturalVeer(sumCorr);
+    } catch (const std::runtime_error& e) {
+      // magnitude throw should come out
+      CHECK(std::string(e.what()) == "Magnitude is zero");
+    }
+  }
 }
 
 TEST_CASE("Flock evolution")
@@ -154,7 +158,7 @@ TEST_CASE("Flock evolution")
     flock.push_back(b1);
     flock.push_back(b2);
 
-    Flock f(flock, 1.7, 3.0, 6.0);
+    Flock f(flock, 1.7, 3.0, 6.0, 300., 45.);
     f.evolve(1.0, 1920, 1080);
 
     // Boids should have adjusted their velocities towards each other
@@ -180,7 +184,7 @@ TEST_CASE("Flock evolution")
     flock.push_back(b2);
     flock.push_back(b3);
 
-    Flock f(flock, 1.7, 3.0, 6.0);
+    Flock f(flock, 1.7, 3.0, 6.0, 300., 45.);
     f.evolve(1.0, 1920, 1080);
 
     // Boid N=2 should change his Y velocity
@@ -205,7 +209,7 @@ TEST_CASE("Flock evolution")
     flock.push_back(b2);
     flock.push_back(b3);
 
-    Flock f(flock, 1.7, 3.0, 6.0);
+    Flock f(flock, 1.7, 3.0, 6.0, 300., 45.);
     f.evolve(1.0, 1920, 1080);
 
     // Boid N=0 should change his Y velocity
