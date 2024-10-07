@@ -1,43 +1,19 @@
 #include "Flock.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Time.hpp>
-#include <algorithm> //NON li abbiamo usati per ora
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <random>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
-// Funzione per calcolare la distanza media tra tutte le coppie di boids
-double meanDistance(Flock const& flock)
+
+// Functions to calculate the stats about positions of boids
+std::pair<double, double> meanAndStdDevDistance(Flock const& f)
 {
-  auto const& boids = flock.flock_; // Accede al vettore di boids
+  auto const& boids = f.flock_;
   double sum_distance{0};
-  int count{0};
-
-  for (unsigned int i = 0; i < boids.size() - 1; ++i) {
-    for (unsigned int j = i + 1; j < boids.size(); ++j) {
-      double dx       = boids[i].pos.getX() - boids[j].pos.getX();
-      double dy       = boids[i].pos.getY() - boids[j].pos.getY();
-      double distance = std::sqrt(dx * dx + dy * dy);
-      sum_distance += distance;
-      ++count;
-    }
-  }
-
-  if (count == 0) {
-    return 0.0;
-  }
-
-  else {
-    return sum_distance / count;
-  }
-}
-
-// Funzione per calcolare la deviazione standard delle distanze tra tutte le
-double stdDevDistance(Flock const& flock, double mean)
-{
-  auto const& boids = flock.flock_;
   double sum_squared_diff{0};
   int count{0};
 
@@ -46,82 +22,82 @@ double stdDevDistance(Flock const& flock, double mean)
       double dx       = boids[i].pos.getX() - boids[j].pos.getX();
       double dy       = boids[i].pos.getY() - boids[j].pos.getY();
       double distance = std::sqrt(dx * dx + dy * dy);
-      double diff     = distance - mean;
-      sum_squared_diff += diff * diff;
+      // Sommiamo le distanze totali
+      sum_distance += distance;
       ++count;
+      // Incrementiamo la somma delle differenze quadrate rispetto alla med...
+      double mean_so_far = sum_distance / count;
+      double diff        = distance - mean_so_far;
+      sum_squared_diff += diff * diff;
     }
   }
-
   if (count == 0) {
-    return 0.0;
-  } else {
-    return std::sqrt(sum_squared_diff / count);
+    return {0.0, 0.0}; // Caso in cui ci siano zero boid
   }
+  double mean     = sum_distance / count;     // Calcoliamo la media finale
+  double variance = sum_squared_diff / count; // La varianza
+
+  return {mean, std::sqrt(variance)};
 }
 
-// Funzione per calcolare la velocità media di tutti i boids
-double meanSpeed(Flock const& flock)
-{
-  auto const& boids = flock.flock_; // Accede al vettore di boids
-  double sum_speed{0};
-  long unsigned int count = boids.size();
-
-  for (const auto& boid : boids) {
-    sum_speed +=
-        boid.vel.magnitude(); // Somma le velocità (modulo del vettore velocità)
-  }
-
-  if (count == 0) {
-    return 0.0;
-  } else {
-    return sum_speed / static_cast<double>(count);
-  }
-}
-
-// Funzione per calcolare la deviazione standard delle velocità
-double stdDevSpeed(Flock const& flock, double mean)
+// Functions to calculate the stats about speeds of boids
+std::pair<double, double> meanAndStdDevSpeed(Flock const& flock)
 {
   auto const& boids = flock.flock_;
+  double sum_speed{0};
   double sum_squared_diff{0};
   long unsigned int count = boids.size();
 
   for (const auto& boid : boids) {
     double speed = boid.vel.magnitude();
-    double diff  = speed - mean;
+    sum_speed += speed;
+    // Calcoliamo la media parziale e aggiorniamo le differenze quadrate
+    double mean_so_far = sum_speed / (boid.N + 1);
+    double diff        = speed - mean_so_far;
     sum_squared_diff += diff * diff;
   }
-
   if (count == 0) {
-    return 0.0;
-  } else {
-    return std::sqrt(sum_squared_diff / static_cast<double>(count));
+    return {0.0, 0.0};
   }
+  double mean     = sum_speed / static_cast<double>(count); // Media finale
+  double variance = sum_squared_diff / static_cast<double>(count); // Varianza
+
+  return {mean, std::sqrt(variance)};
 }
 
 int main()
 {
   try {
-    // display
-    auto const display_width  = 1152;
-    auto const display_height = 720;
+    // fixed display size
+    auto const dispWidth  = 1152;
+    auto const dispHeight = 720;
+    std::cout << "Display width = " << dispWidth << " ; "
+              << "Display height : " << dispHeight << '\n';
 
-    std::cout << "Display width = " << display_width << " ; "
-              << "Display height : " << display_height << '\n';
-
-    // variabili
-    auto const delta_t{sf::milliseconds(33)};
-
-    // creazione di  "Flock f"
+    // gathering the parameters
     unsigned int numBoids;
     double a;
     double c;
     double s;
+    double radOfVision;
+    double radTooClose;
+
     char choice;
 
-    std::cout << "Inserire il numero dei boids: ";
+    const double MIN_COEFF = 0.1;  // Valore minimo accettabile
+    const double MAX_COEFF = 10.0; // Valore massimo accettabile
+
+    // Input del numero di boid
+    std::cout << "Questo è un programma che simula l'andamento dei boids "
+                 "secondo il modello di Craig Reynolds\n"
+              << "E' possibile successivamente scegliere i parametri "
+                 "fondamentali della simulazione oppure \n"
+              << "eseguire il programma con i parametri di default (scegliendo "
+                 "di non cambiarli)\n\n\n";
+    std::cout << "Inserire il numero dei boids (intero positivo): ";
     while (true) {
       std::cin >> numBoids;
-      if (std::cin.fail()) {
+      if (std::cin.fail() || numBoids <= 0) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cout << "Input non valido. Per favore, inserisci un numero intero "
@@ -130,119 +106,136 @@ int main()
         break;
       }
     }
-    std::cout << '\n' << "Cambiare i coefficienti? (y : yes   n : no)" << '\n';
-    std::cin >> choice;
-    /*if (choice == 'y') {
-      std::cout << "Inserire i coefficienti..." << '\n' << "a: ";
-      std::cin >> a;
-      std::cout << '\n' << "c: ";
-      std::cin >> c;
-      std::cout << '\n' << "s: ";
-      std::cin >> s;
-    } else {
-      a = 3.; // 1.8
-      c = 3.; // 1.
-      s = 7.; // 2.5
-    }*/
-    if (choice == 'y') {
-      std::cout << "Inserire il coefficiente a (intero positivo): ";
-      while (true) {
-        std::cin >> a;
-        if (std::cin.fail() || a <= 0) {
-          std::cin.clear();
-          std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
-                          '\n'); // Ignora i caratteri non validi nel buffer
-          std::cout << "Input non valido. Inserisci un numero intero positivo "
-                       "per a: ";
-        } else {
-          break; // Esci dal ciclo se l'input è valido
+    // Chiedi se l'utente vuole cambiare i coefficienti
+    while (true) {
+      std::cout << "\nCambiare i coefficienti? (y : yes   n : no): ";
+      std::cin >> choice;
+      if (choice == 'y') {
+        // Input del coefficiente a
+        std::cout << "Inserire il coefficiente a (double positivo tra "
+                  << MIN_COEFF << " e " << MAX_COEFF << "): ";
+        while (true) {
+          std::cin >> a;
+          if (std::cin.fail() || a < MIN_COEFF || a > MAX_COEFF) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Input non valido. Inserisci un valore double "
+                         "positivo per a tra "
+                      << MIN_COEFF << " e " << MAX_COEFF << ": ";
+          } else {
+            break;
+          }
         }
-      }
-      std::cout << "Inserire il coefficiente c (intero positivo): ";
-      while (true) {
-        std::cin >> c;
-        if (std::cin.fail() || c <= 0) {
-          std::cin.clear();
-          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-          std::cout << "Input non valido. Inserisci un numero intero positivo "
-                       "per c: ";
-        } else {
-          break;
+        // Input del coefficiente c
+        std::cout << "Inserire il coefficiente c (double positivo tra "
+                  << MIN_COEFF << " e " << MAX_COEFF << "): ";
+        while (true) {
+          std::cin >> c;
+          if (std::cin.fail() || c < MIN_COEFF || c > MAX_COEFF) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Input non valido. Inserisci un valore double "
+                         "positivo per c tra "
+                      << MIN_COEFF << " e " << MAX_COEFF << ": ";
+          } else {
+            break;
+          }
         }
-      }
-      std::cout << "Inserire il coefficiente s (intero positivo): ";
-      while (true) {
-        std::cin >> s;
-        if (std::cin.fail() || s <= 0) {
-          std::cin.clear();
-          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-          std::cout << "Input non valido. Inserisci un numero intero positivo "
-                       "per s: ";
-        } else {
-          break;
+        // Input del coefficiente s
+        std::cout << "Inserire il coefficiente s (double positivo tra "
+                  << MIN_COEFF << " e " << MAX_COEFF << "): ";
+        while (true) {
+          std::cin >> s;
+          if (std::cin.fail() || s < MIN_COEFF || s > MAX_COEFF) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Input non valido. Inserisci un valore double "
+                         "positivo per s tra "
+                      << MIN_COEFF << " e " << MAX_COEFF << ": ";
+          } else {
+            break;
+          }
         }
+        std::cout << "Inserire il raggio di separazione:";
+        while (true) {
+          std::cin >> radTooClose;
+          if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Input non valido. Inserisci un valore double:";
+          } else {
+            break;
+          }
+        }
+        std::cout << "Inserire il raggio di visione:";
+        while (true) {
+          std::cin >> radOfVision;
+          if (std::cin.fail() || radOfVision > radTooClose) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Input non valido. Inserisci un valore double:";
+          } else {
+            break;
+          }
+        }
+        break; // Esci dal ciclo dopo aver impostato i coefficienti
+      } else if (choice == 'n') {
+        // Valori di default se non si cambiano i coefficienti
+        a = 1.8;
+        c = 1.0;
+        s = 2.5;
+        break; // Esci dal ciclo
+      } else {
+        std::cout << "Scelta non valida. Per favore, inserisci 'y' o 'n'.\n";
+        // Il ciclo ripete la domanda
       }
-
-    } else {
-      // Valori di default se non si cambiano i coefficienti
-      a = 3;
-      c = 3;
-      s = 7;
     }
 
-    // creazione flock
+    // creation of the Flock (random initial pos & vel)
     std::vector<Boid> flock(numBoids);
-    // inizializzazione immediata visto che conosco già grandezza,
-    // evita riallocazioni multiple della memoria man mano che
-    // riempio
-
     std::random_device r;
     std::default_random_engine gen{r()};
 
-    // riempimento random
     for (unsigned int i = 0; i != numBoids; i++) {
       if (i < numBoids / 2) {
-        std::uniform_real_distribution<double> random_height(200., 600);
-        std::uniform_real_distribution<double> random_width(100., 500.);
-        std::uniform_real_distribution<double> random_velocity(-50., 50.);
-        flock[i].pos.setX(random_width(gen));
-        flock[i].pos.setY(random_height(gen));
-        flock[i].vel.setX(random_velocity(gen));
-        flock[i].vel.setY(random_velocity(gen));
+        std::uniform_real_distribution<double> randomHeight(200., 600);
+        std::uniform_real_distribution<double> randomWidth(100., 500.);
+        std::uniform_real_distribution<double> randomVel(-80., 8.);
+        flock[i].pos.setX(randomWidth(gen));
+        flock[i].pos.setY(randomHeight(gen));
+        flock[i].vel.setX(randomVel(gen));
+        flock[i].vel.setY(randomVel(gen));
         flock[i].N = i;
       } else {
-        std::uniform_real_distribution<double> random_height(200., 600.);
-        std::uniform_real_distribution<double> random_width(700., 1100.);
-        std::uniform_real_distribution<double> random_velocity(-50., 50.);
-        flock[i].pos.setX(random_width(gen));
-        flock[i].pos.setY(random_height(gen));
-        flock[i].vel.setX(random_velocity(gen));
-        flock[i].vel.setY(random_velocity(gen));
+        std::uniform_real_distribution<double> randomHeight(200., 600.);
+        std::uniform_real_distribution<double> randomWidth(700., 1100.);
+        std::uniform_real_distribution<double> randomVel(-8., 80.);
+        flock[i].pos.setX(randomWidth(gen));
+        flock[i].pos.setY(randomHeight(gen));
+        flock[i].vel.setX(randomVel(gen));
+        flock[i].vel.setY(randomVel(gen));
         flock[i].N = i;
       }
     }
 
-    Flock f{flock, a, c, s};
+    Flock f{flock, a, c, s, radOfVision, radOfVision};
 
-    // creazione finestra sfml
-    sf::RenderWindow window(sf::VideoMode(display_width, display_height),
+    // rendering the sfml window
+    sf::RenderWindow window(sf::VideoMode(dispWidth, dispHeight),
                             "Boids simulation");
     window.setVerticalSyncEnabled(true);
 
-    // caricamento immagine e testi
+    // loading images and fonts
     sf::Font font;
-
-    if (!font.loadFromFile("../others/Roboto-Bold.ttf")) { //
-      // Gestisci l'errore se il font non viene caricato
+    if (!font.loadFromFile("../others/Roboto-Bold.ttf")) {
       std::cout << "Could not load texture" << '\n';
       return -1;
     }
-
     sf::Text statsText;
     statsText.setFont(font);
     statsText.setCharacterSize(20);
     statsText.setFillColor(sf::Color::White);
-    statsText.setPosition(10.f, 10.f); // Posizione del testo nella finestra
+    statsText.setPosition(10.f, 10.f);
 
     sf::Texture texture;
     if (!texture.loadFromFile("../images/Boid.png")) {
@@ -260,20 +253,16 @@ int main()
       throw std::runtime_error(
           "Impossibile caricare la texture '../images/Boid.png'");
       window.close();
-      return 0; // bisogna lasciare anche queste? Bisogna fare una funzione
+      return 0;
     }
     sf::Sprite sprite1;
     sprite1.setTexture(texture1);
-    float scaleX = static_cast<float>(display_width) / texture1.getSize().x;
-    float scaleY = static_cast<float>(display_height) / texture1.getSize().y;
-    sprite1.setScale(scaleX, scaleY);
     sprite1.setScale(1.17f, 1.17f);
 
-    bool wait = false;
-
-    // ciclo per stampa continua dei frame
-
+    // loop for evolving and frame printing process
     window.setFramerateLimit(60);
+    auto const delta_t{sf::milliseconds(33)};
+
     while (window.isOpen()) {
       sf::Event event;
 
@@ -281,40 +270,35 @@ int main()
         if (event.type == sf::Event::Closed)
           window.close();
       }
-      if (wait == true) { // codice quando il gioco è in pausa
+
+      window.clear(sf::Color::White);
+      window.draw(sprite1);
+
+      double const dt{delta_t.asSeconds()};
+      f.evolve(dt, dispWidth, dispHeight);
+
+      for (auto& u : f.flock_) {
+        sprite.setPosition(static_cast<float>(u.pos.getX()),
+                           static_cast<float>(u.pos.getY()));
+        double angle = std::atan2(u.vel.getY(), u.vel.getX()) * 180 / M_PI;
+        sprite.setRotation(static_cast<float>(angle + 90.));
+        window.draw(sprite);
       }
 
-      if (wait == false) {
-        window.clear(sf::Color::White);
-        window.draw(sprite1);
+      // print the stats
+      std::pair<double, double> statDist  = meanAndStdDevDistance(f);
+      std::pair<double, double> statSpeed = meanAndStdDevSpeed(f);
+      std::stringstream ss;
+      ss << "Distanza media: " << statDist.first
+         << "\nDeviazione standard: " << statDist.second
+         << "\nVelocita' media: " << statSpeed.first << " px/s"
+         << "\nDeviazione standard: " << statSpeed.second << " px/s";
+      statsText.setString(ss.str());
 
-        double const dt{delta_t.asSeconds()};
-        f.evolve(dt, display_width, display_height);
-
-        for (auto& u : f.flock_) {
-          sprite.setPosition(static_cast<float>(u.pos.getX()),
-                             static_cast<float>(u.pos.getY()));
-          double angle = std::atan2(u.vel.getY(), u.vel.getX()) * 180 / M_PI;
-          sprite.setRotation(static_cast<float>(angle + 90.));
-          window.draw(sprite);
-        }
-
-        double mean          = meanDistance(f);
-        double std_dev       = stdDevDistance(f, mean);
-        double mean_speed    = meanSpeed(f);
-        double std_dev_speed = stdDevSpeed(f, mean_speed);
-
-        std::stringstream ss;
-        ss << "Distanza media: " << mean << "\nDeviazione standard: " << std_dev
-           << "\nVelocita' media: " << mean_speed << " px/s"
-           << "\nDeviazione standard: " << std_dev_speed << " px/s";
-
-        statsText.setString(ss.str());
-
-        window.draw(statsText);
-        window.display();
-      }
+      window.draw(statsText);
+      window.display();
     }
+
   } catch (const std::exception& e) {
     std::cerr << "Errore irreversibile: " << e.what() << std::endl;
     return EXIT_FAILURE; // posizione giusta di catch?
