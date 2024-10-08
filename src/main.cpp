@@ -80,8 +80,8 @@ int main()
 
     char choice;
 
-    const double MIN_COEFF = 0.1;  // Minimum acceptable value
-    const double MAX_COEFF = 10.0; // Maximum acceptable value
+    const double minCoeffAC = 0.1; 
+    const double minCoeffS = 7.;
 
     std::cout << "This is a program that simulates the behavior of boids "
                  "according to Craig Reynolds' model\n"
@@ -89,13 +89,13 @@ int main()
                  "simulation or \n"
               << "run the program with default parameters (by choosing not to "
                  "change them)\n\n\n";
-    std::cout << "Enter the number of boids (positive integer): ";
+    std::cout << "Enter the number of boids (positive integer<400): ";
     while (true) {
       std::cin >> numBoids;
-      if (std::cin.fail() || numBoids <= 0) {
+      if (std::cin.fail() || numBoids <= 0 || numBoids > 400) {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Invalid input. Please enter a positive integer: ";
+        std::cout << "Invalid input. Please enter a positive integer<400 : ";
       } else {
         break;
       }
@@ -105,44 +105,38 @@ int main()
       std::cin >> choice;
       if (choice == 'y') {
         // Input coefficient a
-        std::cout << "Enter coefficient a (positive double between "
-                  << MIN_COEFF << " and " << MAX_COEFF << "): ";
+        std::cout << "Enter coefficient a (positive double grater than: "<< minCoeffAC << "): ";
         while (true) {
           std::cin >> a;
-          if (std::cin.fail() || a < MIN_COEFF || a > MAX_COEFF) {
+          if (std::cin.fail() || a < minCoeffAC) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout
-                << "Invalid input. Enter a positive double value for a between "
-                << MIN_COEFF << " and " << MAX_COEFF << ": ";
+                << "Invalid input. Enter a positive double value grater than "<< minCoeffAC << ":";
           } else {
             break;
           }
         }
-        std::cout << "Enter coefficient c (positive double between "
-                  << MIN_COEFF << " and " << MAX_COEFF << "): ";
+        std::cout << "Enter coefficient a (positive double grater than: "<< minCoeffAC << "): ";
         while (true) {
           std::cin >> c;
-          if (std::cin.fail() || c < MIN_COEFF || c > MAX_COEFF) {
+          if (std::cin.fail() || c < minCoeffAC) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout
-                << "Invalid input. Enter a positive double value for c between "
-                << MIN_COEFF << " and " << MAX_COEFF << ": ";
+                << "Invalid input. Enter a positive double value grater than "<< minCoeffAC << ":";
           } else {
             break;
           }
         }
-        std::cout << "Enter coefficient s (positive double between "
-                  << MIN_COEFF << " and " << MAX_COEFF << "): ";
+        std::cout << "Enter coefficient a (positive double grater than: "<< minCoeffS << ".): ";
         while (true) {
           std::cin >> s;
-          if (std::cin.fail() || s < MIN_COEFF || s > MAX_COEFF) {
+          if (std::cin.fail() || s < minCoeffS) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout
-                << "Invalid input. Enter a positive double value for s between "
-                << MIN_COEFF << " and " << MAX_COEFF << ": ";
+                << "Invalid input. Enter a positive double value grater than "<< minCoeffS << ".:";
           } else {
             break;
           }
@@ -172,11 +166,11 @@ int main()
         break; 
       } else if (choice == 'n') {
         // Default values if the coefficients are not changed
-        a = 1.8;
-        c = 1.0;
-        s = 3.5;
+        a = 1.;
+        c = 2.;
+        s = 7.;
         radOfVision = 300.;
-        radTooClose = 45.;
+        radTooClose = 30.;
         break; 
       } else {
         std::cout << "Invalid choice. Please enter 'y' or 'n'.\n";
@@ -250,8 +244,9 @@ int main()
     sprite1.setScale(1.17f, 1.17f);
 
     // loop for evolving the flock and frame printing process
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(30);
     auto const delta_t{sf::milliseconds(33)};
+
 
     while (window.isOpen()) {
       sf::Event event;
