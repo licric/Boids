@@ -13,7 +13,7 @@ struct Neighbors
 
   Neighbors(std::size_t flockSize)
   {
-    seen.reserve(flockSize * 30); 
+    seen.reserve(flockSize*150); 
     offset.resize(flockSize);
     howMany.resize(flockSize);
   }
@@ -24,12 +24,12 @@ inline Neighbors findNeighbors(std::vector<Boid> const& flock,
                                double angleOfVision, double radOfVision)
 {
   Neighbors neighbors(flock.size());
-  unsigned int currentOffset = 0;
+  unsigned int currentOffset{0};
 
   for (unsigned int i = 0; i < flock.size(); ++i) {
     // memorizes the starting point in seen vector for each boid
     neighbors.offset[i]         = currentOffset;
-    unsigned int countNeighbors = 0;
+    unsigned int countNeighbors{0};
 
     for (unsigned int j = 0; j < flock.size(); ++j) {
       if (j != i && flock[i].boidCanSee(flock[j], angleOfVision, radOfVision)) {
