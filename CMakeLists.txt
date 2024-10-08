@@ -27,6 +27,7 @@ find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 add_executable(main src/main.cpp src/Flock.cpp src/Boid.cpp src/Vec2D.cpp)
 target_link_libraries(main PRIVATE sfml-graphics)
 
+
 # se il testing e' abilitato...
 #   per disabilitare il testing, passare -DBUILD_TESTING=OFF a cmake durante la fase di configurazione
 if (BUILD_TESTING)
