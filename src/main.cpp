@@ -80,8 +80,8 @@ int main()
 
     char choice;
 
-    const double minCoeffAC = 0.1; 
-    const double minCoeffS = 7.;
+    const double minCoeffAC = 0.1;
+    const double minCoeffS  = 7.;
 
     std::cout << "This is a program that simulates the behavior of boids "
                  "according to Craig Reynolds' model\n"
@@ -105,38 +105,44 @@ int main()
       std::cin >> choice;
       if (choice == 'y') {
         // Input coefficient a
-        std::cout << "Enter coefficient a (positive double grater than: "<< minCoeffAC << "): ";
+        std::cout << "Enter coefficient a (positive double grater than: "
+                  << minCoeffAC << "): ";
         while (true) {
           std::cin >> a;
           if (std::cin.fail() || a < minCoeffAC) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout
-                << "Invalid input. Enter a positive double value grater than "<< minCoeffAC << ":";
+                << "Invalid input. Enter a positive double value grater than "
+                << minCoeffAC << ":";
           } else {
             break;
           }
         }
-        std::cout << "Enter coefficient a (positive double grater than: "<< minCoeffAC << "): ";
+        std::cout << "Enter coefficient a (positive double grater than: "
+                  << minCoeffAC << "): ";
         while (true) {
           std::cin >> c;
           if (std::cin.fail() || c < minCoeffAC) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout
-                << "Invalid input. Enter a positive double value grater than "<< minCoeffAC << ":";
+                << "Invalid input. Enter a positive double value grater than "
+                << minCoeffAC << ":";
           } else {
             break;
           }
         }
-        std::cout << "Enter coefficient a (positive double grater than: "<< minCoeffS << ".): ";
+        std::cout << "Enter coefficient a (positive double grater than: "
+                  << minCoeffS << ".): ";
         while (true) {
           std::cin >> s;
           if (std::cin.fail() || s < minCoeffS) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout
-                << "Invalid input. Enter a positive double value grater than "<< minCoeffS << ".:";
+                << "Invalid input. Enter a positive double value grater than "
+                << minCoeffS << ".:";
           } else {
             break;
           }
@@ -163,15 +169,15 @@ int main()
             break;
           }
         }
-        break; 
+        break;
       } else if (choice == 'n') {
         // Default values if the coefficients are not changed
-        a = 1.;
-        c = 2.;
-        s = 7.;
+        a           = 1.;
+        c           = 2.;
+        s           = 7.;
         radOfVision = 300.;
         radTooClose = 30.;
-        break; 
+        break;
       } else {
         std::cout << "Invalid choice. Please enter 'y' or 'n'.\n";
       }
@@ -246,7 +252,6 @@ int main()
     // loop for evolving the flock and frame printing process
     window.setFramerateLimit(30);
     auto const delta_t{sf::milliseconds(33)};
-
 
     while (window.isOpen()) {
       sf::Event event;
