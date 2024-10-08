@@ -13,7 +13,7 @@ Flock::Flock(std::vector<Boid> const& flock, double a, double c, double s,
 // computing the 3 corrections (cohesion, alignment, separation)
 void Flock::compute(Corrections& corr)
 {
-  Neighbors neighbors = findNeighbors(flock_, 80., radOfVision_);
+  Neighbors neighbors = findNeighbors(flock_, angleOfVision_, radOfVision_);
 
   for (unsigned int N = 0; N < flock_.size(); ++N) {
     unsigned int start = neighbors.offset[N];
