@@ -27,7 +27,7 @@ class Flock
   double radOfVision_{};
   double radTooClose_{};
   // fixed parameter
-  //double angleOfVision_{90.};
+  double angleOfVision_{80.};
 
  public:
   std::vector<Boid> flock_;
